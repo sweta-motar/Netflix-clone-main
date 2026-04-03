@@ -1,0 +1,30 @@
+pipeline {
+    agent any
+
+    stages {
+
+        stage('Clone Code') {
+            steps {
+                git branch: 'main', url: 'https://github.com/sweta-motar/Netflix-clone-main.git'
+            }
+        }
+
+        stage('Build Docker Image') {
+            steps {
+                sh 'docker build -t netflix-clone .'
+            }
+        }
+
+        stage('Stop Old Container') {
+            steps {
+                sh 'docker rm -f netflix-container || true'
+            }
+        }
+
+        stage('Run New Container') {
+            steps {
+                sh 'docker run -d -p 8091:80 --name netflix-container netflix-clone'
+            }
+        }
+    }
+}
