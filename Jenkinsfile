@@ -3,6 +3,12 @@ pipeline {
 
     stages {
 
+        stage('Clone Code') {
+            steps {
+                git branch: 'main', url: 'https://github.com/sweta-motar/Netflix-clone-main.git'
+            }
+        }
+
         stage('Build Docker Image') {
             steps {
                 sh 'docker build -t netflix-clone .'
@@ -19,6 +25,19 @@ pipeline {
             steps {
                 sh 'docker run -d -p 8091:80 --name netflix-container netflix-clone'
             }
+        }
+    }
+
+    post {
+        success {
+            mail to: 'swetamotar@gmail.com',
+                 subject: 'Build Success ✅',
+                 body: 'Pipeline executed successfully!'
+        }
+        failure {
+            mail to: 'swetamotar@gmail.com',
+                 subject: 'Build Failed ❌',
+                 body: 'Pipeline failed!'
         }
     }
 }
