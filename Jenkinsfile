@@ -11,7 +11,12 @@ pipeline {
 
         stage('Build Docker Image') {
             steps {
-                sh 'docker build -t netflix-clone .'
+                withCredentials([string(credentialsId: 'TMDB_API_KEY', variable: 'API_KEY')]) {
+                    sh '''
+                    docker build -t netflix-clone \
+                    --build-arg TMDB_V3_API_KEY=$API_KEY .
+                    '''
+                }
             }
         }
 
@@ -32,12 +37,26 @@ pipeline {
         success {
             mail to: 'swetamotar@gmail.com',
                  subject: 'Build Success ✅',
-                 body: 'Pipeline executed successfully!'
+                 body: """
+Build Status: SUCCESS
+
+Application URL:
+http://localhost:8091
+
+Jenkins Build Details:
+${env.BUILD_URL}
+"""
         }
+
         failure {
             mail to: 'swetamotar@gmail.com',
                  subject: 'Build Failed ❌',
-                 body: 'Pipeline failed!'
+                 body: """
+Build Status: FAILED
+
+Check Jenkins Logs:
+${env.BUILD_URL}
+"""
         }
     }
 }
