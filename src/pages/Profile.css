@@ -1,0 +1,59 @@
+.profile {
+  background: #141414;
+  height: 100vh;
+  color: white;
+  text-align: center;
+  padding-top: 100px;
+}
+
+.profile h1 {
+  font-size: 40px;
+}
+
+/* 🎬 GRID */
+.profiles {
+  display: flex;
+  justify-content: center;
+  gap: 40px;
+  margin-top: 40px;
+  flex-wrap: wrap;
+}
+
+/* 🎬 PROFILE CARD */
+.profile-card {
+  cursor: pointer;
+  transition: transform 0.3s;
+}
+
+.profile-card img {
+  width: 130px;
+  height: 130px;
+  object-fit: cover;
+  border-radius: 8px;
+}
+
+.profile-card:hover {
+  transform: scale(1.1);
+}
+
+.profile-card p {
+  margin-top: 10px;
+}
+
+/* ➕ ADD PROFILE */
+.profile-card.add {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+.add-icon {
+  width: 130px;
+  height: 130px;
+  background: #333;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  font-size: 40px;
+  border-radius: 8px;
+}

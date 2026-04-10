@@ -1,0 +1,72 @@
+.player-page {
+  background: black;
+  height: 100vh;
+  position: relative;
+}
+
+/* VIDEO CONTAINER */
+.video-container {
+  position: relative;
+  width: 100%;
+  height: 100%;
+  overflow: hidden;
+}
+
+/* 🔥 HIDE YOUTUBE UI (ZOOM TRICK) */
+.video-frame {
+  width: 120%;
+  height: 120%;
+  position: absolute;
+  top: -10%;
+  left: -10%;
+  border: none;
+  
+}
+
+/* 🎬 GRADIENT OVERLAY */
+.video-overlay {
+  position: absolute;
+  bottom: 0;
+  width: 100%;
+  height: 200px;
+  background: linear-gradient(to top, black, transparent);
+}
+
+/* 🔙 BACK BUTTON */
+.back-btn {
+  position: absolute;
+  top: 20px;
+  left: 20px;
+  z-index: 10;
+  background: transparent;
+  border: none;
+  color: white;
+  font-size: 24px;
+  cursor: pointer;
+}
+
+/* 🎬 INFO TEXT */
+.video-info {
+  position: absolute;
+  bottom: 40px;
+  left: 40px;
+  color: white;
+  max-width: 600px;
+}
+
+.video-info h1 {
+  font-size: 40px;
+  margin-bottom: 10px;
+}
+
+.video-info p {
+  font-size: 14px;
+  color: #ccc;
+}
+
+/* LOADING TEXT */
+.loading {
+  color: white;
+  text-align: center;
+  margin-top: 200px;
+}

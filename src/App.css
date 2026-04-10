@@ -1,0 +1,107 @@
+body {
+  margin: 0;
+  background-color: #141414;
+  overflow-x: hidden;
+  font-family: Arial, sans-serif;
+}
+
+/* HEADINGS */
+h1, h2, h3, p {
+  margin: 0;
+}
+
+/* ROW TITLE */
+h2 {
+  margin-left: 20px;
+  font-size: 20px;
+  font-weight: 500;
+  color: #e5e5e5;
+}
+
+/* FADE */
+.fade {
+  animation: fadeIn 0.5s ease-in;
+}
+
+/* SCROLL FIX */
+::-webkit-scrollbar {
+  display: none;
+}
+
+/* LOADER */
+.loader-container {
+  height: 100vh;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  background: black;
+}
+
+.loader-logo {
+  font-size: 40px;
+  color: red;
+  font-weight: bold;
+  animation: pulse 1.2s infinite;
+}
+
+@keyframes pulse {
+  0% { opacity: 0.3; }
+  50% { opacity: 1; }
+  100% { opacity: 0.3; }
+}
+
+/* FADE */
+@keyframes fadeIn {
+  from { opacity: 0; transform: translateY(10px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+.movie-title {
+  font-size: 12px;
+  color: #aaa;
+}
+
+/* 🎬 Continue Watching Scroll Fix */
+/* 🎬 CONTINUE WATCHING FINAL */
+.continue-scroll {
+  display: flex;
+  flex-wrap: nowrap;
+
+  overflow-x: auto;
+  overflow-y: hidden;
+
+  gap: 15px;
+  padding: 10px 20px;
+
+  scrollbar-width: none;
+}
+
+.continue-scroll::-webkit-scrollbar {
+  display: none;
+}
+
+/* 🎬 CARD */
+.continue-card {
+  flex: 0 0 auto;
+  width: 150px;
+}
+
+/* 🎬 IMAGE */
+.continue-img {
+  width: 100%;
+  border-radius: 6px;
+  cursor: pointer;
+  transition: transform 0.3s ease;
+}
+
+.continue-img:hover {
+  transform: scale(1.1);
+}
+
+/* 🎬 TITLE */
+.continue-title {
+  font-size: 12px;
+  color: #aaa;
+  margin-top: 5px;
+  text-align: center;
+}
