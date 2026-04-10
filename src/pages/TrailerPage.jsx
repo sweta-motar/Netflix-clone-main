@@ -17,7 +17,6 @@ function TrailerPage({ movie, setSelectedMovie }) {
           `${BASE_URL}movie/${movie.id}/videos?api_key=${API_KEY}`
         );
 
-        // ❗ Check response
         if (!res.ok) {
           console.error("API Error:", res.status);
           setLoading(false);
@@ -26,7 +25,6 @@ function TrailerPage({ movie, setSelectedMovie }) {
 
         const text = await res.text();
 
-        // ❗ Empty response check
         if (!text) {
           console.error("Empty response");
           setLoading(false);
@@ -35,14 +33,13 @@ function TrailerPage({ movie, setSelectedMovie }) {
 
         const data = JSON.parse(text);
 
-        // ❗ No results
         if (!data.results || data.results.length === 0) {
-          console.log("No trailer available");
+          console.log("No trailer found in API");
           setLoading(false);
           return;
         }
 
-        // ✅ Find trailer safely
+        // ✅ Find best trailer
         const trailer =
           data.results.find(
             (vid) =>
@@ -75,7 +72,7 @@ function TrailerPage({ movie, setSelectedMovie }) {
   return (
     <div className="player-page">
 
-      {/* 🔙 BACK */}
+      {/* 🔙 BACK BUTTON */}
       <button
         className="back-btn"
         onClick={() => setSelectedMovie(null)}
@@ -86,22 +83,31 @@ function TrailerPage({ movie, setSelectedMovie }) {
       {/* 🎥 VIDEO SECTION */}
       {loading ? (
         <p className="loading">Loading...</p>
-      ) : trailerId ? (
+      ) : (
         <div className="video-container">
+
           <iframe
             className="video-frame"
-            src={`https://www.youtube.com/embed/${trailerId}?autoplay=1&controls=1&modestbranding=1&rel=0`}
+            src={
+              trailerId
+                ? `https://www.youtube.com/embed/${trailerId}?autoplay=1&controls=1&rel=0`
+                : `https://www.youtube.com/embed/dQw4w9WgXcQ` // 🔥 fallback video
+            }
             title="Trailer"
             allow="autoplay; encrypted-media"
             allowFullScreen
           />
+
           <div className="video-overlay" />
+
+          {/* OPTIONAL MESSAGE */}
+          {!trailerId && (
+            <p className="loading">Trailer not available, showing sample video</p>
+          )}
         </div>
-      ) : (
-        <p className="loading">No Trailer Available</p>
       )}
 
-      {/* 🎬 INFO */}
+      {/* 🎬 MOVIE INFO */}
       <div className="video-info">
         <h1>{movie.title}</h1>
         <p>{movie.overview}</p>
