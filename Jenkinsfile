@@ -9,11 +9,17 @@ pipeline {
             }
         }
 
+        stage('Clean Old Images') {
+            steps {
+                sh 'docker rmi -f netflix-clone || true'
+            }
+        }
+
         stage('Build Docker Image') {
             steps {
                 withCredentials([string(credentialsId: 'TMDB_API_KEY', variable: 'API_KEY')]) {
                     sh '''
-                    docker build -t netflix-clone \
+                    docker build --no-cache -t netflix-clone:latest \
                     --build-arg TMDB_V3_API_KEY=$API_KEY .
                     '''
                 }
@@ -28,7 +34,7 @@ pipeline {
 
         stage('Run New Container') {
             steps {
-                sh 'docker run -d -p 8091:80 --name netflix-container netflix-clone'
+                sh 'docker run -d -p 8091:80 --name netflix-container netflix-clone:latest'
             }
         }
     }
@@ -43,18 +49,7 @@ Build Status: SUCCESS
 Application URL:
 http://localhost:8091
 
-Jenkins Build Details:
-${env.BUILD_URL}
-"""
-        }
-
-        failure {
-            mail to: 'swetamotar@gmail.com',
-                 subject: 'Build Failed ❌',
-                 body: """
-Build Status: FAILED
-
-Check Jenkins Logs:
+Jenkins:
 ${env.BUILD_URL}
 """
         }
