@@ -50,7 +50,7 @@ pipeline {
 Build Status: SUCCESS
 
 Application URL:
-http://localhost:8091
+http://localhost:8091/?v=${env.BUILD_NUMBER}
 
 Jenkins:
 ${env.BUILD_URL}
