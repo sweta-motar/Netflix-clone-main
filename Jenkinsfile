@@ -11,7 +11,10 @@ pipeline {
 
         stage('Clean Old Images') {
             steps {
-                sh 'docker rmi -f netflix-clone || true'
+                 sh '''
+                 docker rm -f netflix-container || true
+                 docker rmi -f netflix-clone || true
+                 '''
             }
         }
 
