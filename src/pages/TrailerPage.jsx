@@ -18,20 +18,15 @@ function TrailerPage({ movie, setSelectedMovie }) {
 
         const data = await res.json();
 
-        // 🔥 SIMPLE LOGIC (like before)
-        let video = null;
+        // ✅ ONLY REAL TRAILER
+        const trailer = data.results?.find(
+          (vid) =>
+            vid.type === "Trailer" &&
+            vid.site === "YouTube"
+        );
 
-        if (data.results && data.results.length > 0) {
-          // Try to find trailer first
-          video =
-            data.results.find(
-              (vid) => vid.type === "Trailer"
-            ) ||
-            data.results[0]; // fallback to ANY video
-        }
-
-        if (video) {
-          setTrailerId(video.key);
+        if (trailer) {
+          setTrailerId(trailer.key);
         }
 
         setLoading(false);
@@ -44,7 +39,7 @@ function TrailerPage({ movie, setSelectedMovie }) {
     if (movie) fetchTrailer();
   }, [movie]);
 
-  // Save history
+  // Save watch history
   useEffect(() => {
     if (movie) {
       saveWatch(movie);
@@ -77,7 +72,9 @@ function TrailerPage({ movie, setSelectedMovie }) {
           <div className="video-overlay" />
         </div>
       ) : (
-        <p className="loading">No Video Found</p>
+        <p className="loading">
+          Trailer not available for this movie
+        </p>
       )}
 
       {/* INFO */}
