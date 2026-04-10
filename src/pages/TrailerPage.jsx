@@ -13,7 +13,7 @@ function TrailerPage({ movie, setSelectedMovie }) {
     const fetchTrailer = async () => {
       try {
         const res = await fetch(
-          `${BASE_URL}movie/${movie.id}/videos?api_key=${API_KEY}`
+          `${BASE_URL}/movie/${movie.id}/videos?api_key=${API_KEY}`
         );
 
         const data = await res.json();
