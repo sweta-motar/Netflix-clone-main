@@ -3,7 +3,7 @@ import { auth } from "./firebase";
 import { onAuthStateChanged } from "firebase/auth";
 
 import Home from "./pages/Home";
-import Login from "./pages/login";
+import Login from "./pages/Login";
 import Profile from "./pages/Profile";
 import Wishlist from "./pages/Wishlist";
 import TrailerPage from "./pages/TrailerPage";
