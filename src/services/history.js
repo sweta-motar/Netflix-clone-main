@@ -1,28 +1,51 @@
+const BASE_URL = "http://127.0.0.1:8000/api";
+
 // GET HISTORY
-export const getHistory = () => {
-  return JSON.parse(localStorage.getItem("history")) || [];
+export const getHistory = async () => {
+  const user_id = localStorage.getItem("user_id");
+
+  const res = await fetch(`${BASE_URL}/get-history/${user_id}/`);
+  return res.json();
 };
 
-// SAVE WATCH
-export const saveWatch = (movie) => {
-  let history = getHistory();
+// SAVE WATCH + RESUME
+export const saveWatch = async (movie) => {
+  const user_id = localStorage.getItem("user_id");
 
-  // remove duplicate
-  history = history.filter((item) => item.id !== movie.id);
+  // 🎯 Save last watched movie locally (for resume)
+  localStorage.setItem("lastMovie", JSON.stringify(movie));
 
-  // add to top
-  history.unshift(movie);
-
-  localStorage.setItem("history", JSON.stringify(history));
+  await fetch(`${BASE_URL}/add-history/`, {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+    },
+    body: JSON.stringify({
+      user_id,
+      movie_id: movie.id,
+      title: movie.title,
+      poster: movie.poster_path,
+    }),
+  });
 };
 
-// ❌ REMOVE FROM HISTORY
-export const removeFromHistory = (movie) => {
-  let history = getHistory();
+// GET LAST WATCHED (resume)
+export const getLastWatched = () => {
+  return JSON.parse(localStorage.getItem("lastMovie"));
+};
 
-  const updated = history.filter((item) => item.id !== movie.id);
+// REMOVE
+export const removeFromHistory = async (movie_id) => {
+  const user_id = localStorage.getItem("user_id");
 
-  localStorage.setItem("history", JSON.stringify(updated));
-
-  return updated; // ✅ return updated list
+  await fetch(`${BASE_URL}/remove-history/`, {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+    },
+    body: JSON.stringify({
+      user_id,
+      movie_id,
+    }),
+  });
 };

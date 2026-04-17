@@ -1,6 +1,4 @@
 import { useState, useEffect } from "react";
-import { auth } from "./firebase";
-import { onAuthStateChanged } from "firebase/auth";
 
 import Home from "./pages/Home";
 import Login from "./pages/Login";
@@ -13,44 +11,37 @@ function App() {
   const [profile, setProfile] = useState(null);
   const [page, setPage] = useState("home");
   const [selectedMovie, setSelectedMovie] = useState(null);
-  const [loading, setLoading] = useState(true);
 
-  // 🔥 AUTH LISTENER
   useEffect(() => {
-  const unsubscribe = onAuthStateChanged(auth, (currentUser) => {
-    setUser(currentUser);
-    setLoading(false);
-  });
+    const savedUser = localStorage.getItem("user_id");
+    const savedProfile = localStorage.getItem("profile");
 
-  return () => unsubscribe();
-}, []);
+    if (savedUser) setUser(savedUser);
+    if (savedProfile) setProfile(JSON.parse(savedProfile));
+  }, []);
 
-// ⏳ Wait until Firebase loads
-if (loading) {
-  return <div className="loader-container">NETFLIX</div>;
-}
+  const isAdmin = localStorage.getItem("is_admin") === "true";
 
-// 🔐 ALWAYS SHOW LOGIN FIRST (until user logs in manually)
-if (!user) {
-  return <Login setUser={setUser} />;
-}
+  // 🔐 LOGIN
+  if (!user) return <Login setUser={setUser} />;
 
-  // 🔐 LOGIN PAGE
-  if (!user) {
-  return (
-    <div className="fade">
-      <Login setUser={setUser} />
-    </div>
-  );
-}
+  // ADMIN DIRECT ACCESS
+  //if (isAdmin) {
+    //return (
+      //<Admin
+        //setPage={setPage}
+        //setProfile={setProfile}
+        //setUser={setUser}
+      //>
+    //);
+  //}
 
-  // 👤 PROFILE PAGE
+  // 👤 USER PROFILE
   if (!profile) return <Profile setProfile={setProfile} />;
 
   return (
     <div style={{ background: "#141414", color: "white" }}>
 
-      {/* 🎬 TRAILER PAGE */}
       {selectedMovie && (
         <TrailerPage
           movie={selectedMovie}
@@ -58,7 +49,6 @@ if (!user) {
         />
       )}
 
-      {/* 🏠 HOME */}
       {!selectedMovie && page === "home" && (
         <Home
           setPage={setPage}
@@ -68,16 +58,14 @@ if (!user) {
         />
       )}
 
-      {/* ❤️ WISHLIST */}
       {!selectedMovie && page === "wishlist" && (
-      <Wishlist 
-        setPage={setPage} 
-        setSelectedMovie={(movie) => {
-          setSelectedMovie(movie);
-          setShowDetails(false); // go to trailer
-        }}
-  />
-)}
+        <Wishlist
+          setPage={setPage}
+          setSelectedMovie={setSelectedMovie}
+          setUser={setUser}
+        />
+      )}
+
     </div>
   );
 }

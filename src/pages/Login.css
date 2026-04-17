@@ -81,6 +81,7 @@
 .switch {
   margin-top: 20px;
   font-size: 14px;
+  color: gray;
 }
 
 .switch span {

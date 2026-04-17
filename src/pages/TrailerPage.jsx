@@ -6,50 +6,46 @@ function TrailerPage({ movie, setSelectedMovie }) {
   const [trailerId, setTrailerId] = useState("");
   const [loading, setLoading] = useState(true);
 
-  const BASE_URL = import.meta.env.VITE_APP_API_ENDPOINT_URL;
   const API_KEY = import.meta.env.VITE_APP_TMDB_V3_API_KEY;
 
   useEffect(() => {
     const fetchTrailer = async () => {
       try {
         const res = await fetch(
-          `${BASE_URL}/movie/${movie.id}/videos?api_key=${API_KEY}`
+          `https://api.themoviedb.org/3/movie/${movie.id}/videos?api_key=${API_KEY}`
         );
 
         const data = await res.json();
 
-        // ✅ ONLY REAL TRAILER
-        const trailer = data.results?.find(
-          (vid) =>
-            vid.type === "Trailer" &&
-            vid.site === "YouTube"
-        );
+        // 🔥 STRONG FALLBACK LOGIC (always try to get video)
+        const trailer =
+          data.results?.find(v => v.type === "Trailer" && v.site === "YouTube") ||
+          data.results?.find(v => v.type === "Teaser" && v.site === "YouTube") ||
+          data.results?.find(v => v.site === "YouTube");
 
         if (trailer) {
           setTrailerId(trailer.key);
         }
 
         setLoading(false);
-      } catch (error) {
-        console.error("Error:", error);
+      } catch (err) {
+        console.error(err);
         setLoading(false);
       }
     };
 
-    if (movie) fetchTrailer();
+    if (movie?.id) fetchTrailer();
   }, [movie]);
 
-  // Save watch history
+  // ✅ SAVE HISTORY
   useEffect(() => {
-    if (movie) {
-      saveWatch(movie);
-    }
+    if (movie) saveWatch(movie);
   }, [movie]);
 
   return (
     <div className="player-page">
 
-      {/* BACK BUTTON */}
+      {/* 🔙 BACK */}
       <button
         className="back-btn"
         onClick={() => setSelectedMovie(null)}
@@ -57,30 +53,30 @@ function TrailerPage({ movie, setSelectedMovie }) {
         ←
       </button>
 
-      {/* VIDEO */}
+      {/* 🎬 VIDEO */}
       {loading ? (
         <p className="loading">Loading...</p>
       ) : trailerId ? (
         <div className="video-container">
+
           <iframe
             className="video-frame"
-            src={`https://www.youtube.com/embed/${trailerId}?autoplay=1&controls=1`}
+            src={`https://www.youtube.com/embed/${trailerId}?autoplay=1&controls=0&modestbranding=1&rel=0`}
             title="Trailer"
             allow="autoplay; encrypted-media"
             allowFullScreen
           />
+
           <div className="video-overlay" />
         </div>
       ) : (
-        <p className="loading">
-          Trailer not available for this movie
-        </p>
+        <p className="loading">No trailer available</p>
       )}
 
-      {/* INFO */}
+      {/* 🎬 INFO */}
       <div className="video-info">
-        <h1>{movie.title}</h1>
-        <p>{movie.overview}</p>
+        <h1>{movie?.title}</h1>
+        <p>{movie?.overview}</p>
       </div>
 
     </div>

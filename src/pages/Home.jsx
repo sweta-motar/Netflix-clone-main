@@ -19,14 +19,14 @@ function Home({ setPage, setProfile, setUser, setSelectedMovie }) {
 
       <div style={{ paddingTop: "70px", background: "#141414", minHeight: "100vh" }}>
         <Banner />
-       
 
-        {/* 🤖 AI RECOMMENDATIONS */}
+        {/* 🤖 AI */}
         <AIRecommendations setSelectedMovie={setSelectedMovie} />
 
-        {/* ✅ CORRECT POSITION */}
+        {/* ▶ CONTINUE */}
         <ContinueRow setSelectedMovie={setSelectedMovie} />
 
+        {/* ACTION */}
         <Row
           title="Action"
           fetchUrl="/discover/movie?with_genres=28"
@@ -34,6 +34,7 @@ function Home({ setPage, setProfile, setUser, setSelectedMovie }) {
           setSelectedMovie={setSelectedMovie}
         />
 
+        {/*COMEDY */}
         <Row
           title="Comedy"
           fetchUrl="/discover/movie?with_genres=35"
@@ -41,12 +42,16 @@ function Home({ setPage, setProfile, setUser, setSelectedMovie }) {
           setSelectedMovie={setSelectedMovie}
         />
 
+        {/* HORROR */}
         <Row
           title="Horror"
           fetchUrl="/discover/movie?with_genres=27"
           search={search}
           setSelectedMovie={setSelectedMovie}
         />
+
+
+        {/* ROMANCE */}
         <Row
           title="Romance"
           fetchUrl="/discover/movie?with_genres=10749"

@@ -1,18 +1,52 @@
 import { useEffect, useState } from "react";
-import { getHistory, removeFromHistory } from "../services/history";
+import {
+  getHistory,
+  removeFromHistory,
+  getLastWatched
+} from "../services/history";
 import "./Row.css";
 
 function ContinueRow({ setSelectedMovie }) {
   const [movies, setMovies] = useState([]);
 
   useEffect(() => {
-    setMovies(getHistory());
+    loadHistory();
   }, []);
 
-  // ❌ REMOVE FUNCTION
-  const handleRemove = (movie) => {
-    const updated = removeFromHistory(movie);
-    setMovies(updated); // ✅ instant UI update
+  const loadHistory = async () => {
+    const data = await getHistory();
+
+    const last = getLastWatched();
+
+    let finalData = data;
+
+    if (last) {
+      const exists = data.find(
+        (m) => m.movie_id === last.id
+      );
+
+      if (!exists) {
+        finalData = [
+          {
+            movie_id: last.id,
+            title: last.title,
+            poster: last.poster_path
+          },
+          ...data
+        ];
+      }
+    }
+
+    setMovies(finalData);
+  };
+
+  // ✅ FAST REMOVE (no reload)
+  const handleRemove = async (movie) => {
+    await removeFromHistory(movie.movie_id);
+
+    setMovies((prev) =>
+      prev.filter((m) => m.movie_id !== movie.movie_id)
+    );
   };
 
   return (
@@ -24,26 +58,31 @@ function ContinueRow({ setSelectedMovie }) {
           <p>No history yet</p>
         ) : (
           movies.map((movie) => (
-            <div key={movie.id} className="movie-wrapper">
+            <div key={movie.movie_id} className="movie-wrapper">
 
-              {/* ❌ REMOVE BUTTON */}
+              {/* ❌ REMOVE */}
               <span
                 className="remove-history"
                 onClick={(e) => {
-                  e.stopPropagation(); // 🚨 prevent opening trailer
+                  e.stopPropagation();
                   handleRemove(movie);
                 }}
               >
                 ✕
               </span>
 
+              {/* ✅ FIXED TRAILER PLAY */}
               <img
-                src={`https://image.tmdb.org/t/p/w300${
-                  movie.poster_path || movie.backdrop_path
-                }`}
+                src={`https://image.tmdb.org/t/p/w300${movie.poster}`}
                 alt={movie.title}
                 className="movie-card"
-                onClick={() => setSelectedMovie(movie)}
+                onClick={() =>
+                  setSelectedMovie({
+                    id: movie.movie_id,
+                    title: movie.title,
+                    poster_path: movie.poster
+                  })
+                }
               />
 
               <p className="movie-title">{movie.title}</p>

@@ -1,5 +1,8 @@
 import { useState, useEffect } from "react";
-import { getWishlist, toggleWishlist } from "../services/wishlist";
+import {
+  getWishlist,
+  removeFromWishlist
+} from "../services/wishlist";
 import Navbar from "../components/Navbar";
 import "./Wishlist.css";
 
@@ -7,12 +10,21 @@ function Wishlist({ setPage, setSelectedMovie, setUser }) {
   const [movies, setMovies] = useState([]);
 
   useEffect(() => {
-    setMovies(getWishlist());
+    loadWishlist();
   }, []);
 
-  const removeMovie = (movie) => {
-    const updated = toggleWishlist(movie);
-    setMovies(updated);
+  const loadWishlist = async () => {
+    const data = await getWishlist();
+    setMovies(data);
+  };
+
+  // ✅ FAST REMOVE (no reload)
+  const removeMovie = async (movie) => {
+    await removeFromWishlist(movie.movie_id);
+
+    setMovies((prev) =>
+      prev.filter((m) => m.movie_id !== movie.movie_id)
+    );
   };
 
   return (
@@ -24,26 +36,29 @@ function Wishlist({ setPage, setSelectedMovie, setUser }) {
 
       <div className="wishlist-row">
         {movies.map((movie) => (
-          <div key={movie.id} className="wishlist-card">
+          <div key={movie.movie_id} className="wishlist-card">
 
-            {/* 🎬 IMAGE */}
             <img
-              src={`https://image.tmdb.org/t/p/w300${
-                movie.poster_path || movie.backdrop_path
-              }`}
+              src={`https://image.tmdb.org/t/p/w300${movie.poster}`}
               alt={movie.title}
               className="wishlist-img"
             />
 
-            {/* ▶ PLAY BUTTON CENTER */}
+            {/* ✅ FIXED TRAILER PLAY */}
             <div
               className="play-overlay"
-              onClick={() => setSelectedMovie(movie)}
+              onClick={() =>
+                setSelectedMovie({
+                  id: movie.movie_id,
+                  title: movie.title,
+                  poster_path: movie.poster
+                })
+              }
             >
               ▶
             </div>
 
-            {/* ❌ REMOVE BUTTON */}
+            {/* ❌ REMOVE */}
             <button
               className="remove-btn"
               onClick={(e) => {
