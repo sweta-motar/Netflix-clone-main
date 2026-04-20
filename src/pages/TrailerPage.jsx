@@ -11,19 +11,19 @@ function TrailerPage({ movie, setSelectedMovie }) {
   useEffect(() => {
     const fetchTrailer = async () => {
       try {
+        if (!movie?.id) return;
+
         const res = await fetch(
           `https://api.themoviedb.org/3/movie/${movie.id}/videos?api_key=${API_KEY}`
         );
 
         const data = await res.json();
 
-        // 🔥 STRONG FALLBACK LOGIC (always try to get video)
         const trailer =
           data.results?.find(v => v.type === "Trailer" && v.site === "YouTube") ||
-          data.results?.find(v => v.type === "Teaser" && v.site === "YouTube") ||
           data.results?.find(v => v.site === "YouTube");
 
-        if (trailer) {
+        if (trailer?.key) {
           setTrailerId(trailer.key);
         }
 
@@ -61,8 +61,7 @@ function TrailerPage({ movie, setSelectedMovie }) {
 
           <iframe
             className="video-frame"
-            src={`https://www.youtube.com/embed/${trailerId}?autoplay=1&controls=0&modestbranding=1&rel=0`}
-            title="Trailer"
+            src={`https://www.youtube.com/embed/${trailerId}?autoplay=1&controls=1`}
             allow="autoplay; encrypted-media"
             allowFullScreen
           />

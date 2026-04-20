@@ -1,16 +1,16 @@
-const BASE_URL = "http://127.0.0.1:8000/api";
+const BASE_URL = import.meta.env.VITE_API_URL;
 
 export const getProfiles = async () => {
   const user_id = localStorage.getItem("user_id");
 
-  const res = await fetch(`${BASE_URL}/profiles/${user_id}/`);
+  const res = await fetch(`${BASE_URL}/api/profiles/${user_id}/`);
   return res.json();
 };
 
 export const addProfileAPI = async (name) => {
   const user_id = localStorage.getItem("user_id");
 
-  const res = await fetch(`${BASE_URL}/add-profile/`, {
+  const res = await fetch(`${BASE_URL}/api/add-profile/`, {
     method: "POST",
     headers: {
       "Content-Type": "application/json",
@@ -26,7 +26,7 @@ export const addProfileAPI = async (name) => {
 };
 
 export const deleteProfileAPI = async (id) => {
-  await fetch(`${BASE_URL}/delete-profile/`, {
+  await fetch(`${BASE_URL}/api/delete-profile/`, {
     method: "POST",
     headers: {
       "Content-Type": "application/json",
@@ -36,7 +36,7 @@ export const deleteProfileAPI = async (id) => {
 };
 
 export const updateProfileAPI = async (id, name) => {
-  await fetch(`${BASE_URL}/update-profile/`, {
+  await fetch(`${BASE_URL}/api/update-profile/`, {
     method: "POST",
     headers: {
       "Content-Type": "application/json",

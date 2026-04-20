@@ -21,9 +21,7 @@ function ContinueRow({ setSelectedMovie }) {
     let finalData = data;
 
     if (last) {
-      const exists = data.find(
-        (m) => m.movie_id === last.id
-      );
+      const exists = data.find((m) => m.movie_id === last.id);
 
       if (!exists) {
         finalData = [
@@ -40,7 +38,6 @@ function ContinueRow({ setSelectedMovie }) {
     setMovies(finalData);
   };
 
-  // ✅ FAST REMOVE (no reload)
   const handleRemove = async (movie) => {
     await removeFromHistory(movie.movie_id);
 
@@ -60,7 +57,6 @@ function ContinueRow({ setSelectedMovie }) {
           movies.map((movie) => (
             <div key={movie.movie_id} className="movie-wrapper">
 
-              {/* ❌ REMOVE */}
               <span
                 className="remove-history"
                 onClick={(e) => {
@@ -71,9 +67,12 @@ function ContinueRow({ setSelectedMovie }) {
                 ✕
               </span>
 
-              {/* ✅ FIXED TRAILER PLAY */}
               <img
-                src={`https://image.tmdb.org/t/p/w300${movie.poster}`}
+                src={
+                  movie.poster
+                    ? `https://image.tmdb.org/t/p/w500${movie.poster}`
+                    : "https://via.placeholder.com/300x450?text=No+Image"
+                }
                 alt={movie.title}
                 className="movie-card"
                 onClick={() =>

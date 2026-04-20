@@ -18,7 +18,6 @@ function Wishlist({ setPage, setSelectedMovie, setUser }) {
     setMovies(data);
   };
 
-  // ✅ FAST REMOVE (no reload)
   const removeMovie = async (movie) => {
     await removeFromWishlist(movie.movie_id);
 
@@ -39,12 +38,15 @@ function Wishlist({ setPage, setSelectedMovie, setUser }) {
           <div key={movie.movie_id} className="wishlist-card">
 
             <img
-              src={`https://image.tmdb.org/t/p/w300${movie.poster}`}
+              src={
+                movie.poster
+                  ? `https://image.tmdb.org/t/p/w500${movie.poster}`
+                  : "https://via.placeholder.com/300x450?text=No+Image"
+              }
               alt={movie.title}
               className="wishlist-img"
             />
 
-            {/* ✅ FIXED TRAILER PLAY */}
             <div
               className="play-overlay"
               onClick={() =>
@@ -58,7 +60,6 @@ function Wishlist({ setPage, setSelectedMovie, setUser }) {
               ▶
             </div>
 
-            {/* ❌ REMOVE */}
             <button
               className="remove-btn"
               onClick={(e) => {
@@ -80,3 +81,4 @@ function Wishlist({ setPage, setSelectedMovie, setUser }) {
 }
 
 export default Wishlist;
+

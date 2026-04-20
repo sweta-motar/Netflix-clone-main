@@ -1,9 +1,5 @@
 import { useEffect, useState } from "react";
-import {
-  addToWishlist,
-  removeFromWishlist,
-  getWishlist
-} from "../services/wishlist";
+import { toggleWishlist, getWishlist } from "../services/wishlist";
 import "./Row.css";
 
 function Row({ title, fetchUrl, search, setSelectedMovie }) {
@@ -13,10 +9,16 @@ function Row({ title, fetchUrl, search, setSelectedMovie }) {
   const API_KEY = import.meta.env.VITE_APP_TMDB_V3_API_KEY;
 
   useEffect(() => {
-    fetch(`https://api.themoviedb.org/3${fetchUrl}&api_key=${API_KEY}`)
-      .then((res) => res.json())
-      .then((data) => setMovies(data.results || []));
-  }, [fetchUrl]);
+    const fetchMovies = async () => {
+      const res = await fetch(
+        `https://api.themoviedb.org/3${fetchUrl}&api_key=${API_KEY}`
+      );
+      const data = await res.json();
+      setMovies(data.results || []);
+    };
+
+    fetchMovies();
+  }, [fetchUrl, API_KEY]);
 
   useEffect(() => {
     loadWishlist();
@@ -29,17 +31,8 @@ function Row({ title, fetchUrl, search, setSelectedMovie }) {
   };
 
   const handleWishlist = async (movie) => {
-    if (wishlistIds.includes(movie.id)) {
-      await removeFromWishlist(movie.id);
-    } else {
-      await addToWishlist(movie);
-    }
-
-    setWishlistIds((prev) =>
-      prev.includes(movie.id)
-        ? prev.filter((id) => id !== movie.id)
-        : [...prev, movie.id]
-    );
+    await toggleWishlist(movie);
+    loadWishlist();
   };
 
   const filteredMovies = movies.filter((movie) =>
@@ -65,7 +58,11 @@ function Row({ title, fetchUrl, search, setSelectedMovie }) {
             </span>
 
             <img
-              src={`https://image.tmdb.org/t/p/w300${movie.poster_path}`}
+              src={
+                movie.poster_path
+                  ? `https://image.tmdb.org/t/p/w500${movie.poster_path}`
+                  : "https://via.placeholder.com/300x450?text=No+Image"
+              }
               className="movie-card"
               onClick={() => setSelectedMovie(movie)}
             />
