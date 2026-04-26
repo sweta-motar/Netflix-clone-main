@@ -75,16 +75,25 @@ pipeline {
         }
     }
 
-    post {
-        success {
-            mail to: 'swetamotar@gmail.com',
-                 subject: 'Build Success ✅',
-                 body: "App deployed at http://localhost:8091"
-        }
-        failure {
-            mail to: 'swetamotar@gmail.com',
-                 subject: 'Build Failed ❌',
-                 body: "Check Jenkins logs"
-        }
+   post {
+    success {
+        mail to: 'swetamotar@gmail.com',
+             subject: 'Build Success ✅',
+             body: """
+Application is LIVE 🚀
+
+Frontend:
+http://localhost:8091
+
+Build Number: ${env.BUILD_NUMBER}
+Jenkins: ${env.BUILD_URL}
+"""
     }
+
+    failure {
+        mail to: 'swetamotar@gmail.com',
+             subject: 'Build Failed ❌',
+             body: "Check logs: ${env.BUILD_URL}"
+    }
+}
 }
