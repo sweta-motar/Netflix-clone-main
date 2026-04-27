@@ -5,7 +5,7 @@ const getUserId = () => {
 };
 
 export const getWishlist = async () => {
-  const user_id = getUserId();
+  const user_id = getUserId() || 1; // FIX: DEFAULT TO 1 FOR TESTING
 
   const res = await fetch(`${API}/api/get-wishlist/${user_id}/`);
   return res.json();

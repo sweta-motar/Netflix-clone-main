@@ -10,9 +10,9 @@ urlpatterns = [
     path("users/", views.get_users),
 
     # WISHLIST
-    path("add-wishlist/", views.add_wishlist),
+    path("add-wishlist/", views.toggle_wishlist),
     path("get-wishlist/<int:user_id>/", views.get_wishlist),
-    path("remove-wishlist/", views.remove_wishlist),
+    path("remove-wishlist/", views.toggle_wishlist),
 
     # HISTORY
     path("add-history/", views.add_history),

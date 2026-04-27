@@ -14,7 +14,7 @@ export const getHistory = async () => {
 
 // ✅ ADD HISTORY
 export const saveWatch = async (movie) => {
-  const user_id = getUserId();
+  const user_id = getUserId() || 1; // FIX: DEFAULT TO 1 FOR TESTING
 
   localStorage.setItem("lastWatched", JSON.stringify(movie));
 

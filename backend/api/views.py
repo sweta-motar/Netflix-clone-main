@@ -130,47 +130,6 @@ def get_wishlist(request, user_id):
     except Exception as e:
         return JsonResponse({"error": str(e)}, status=400)
 
-
-# ---------------- HISTORY ----------------
-@csrf_exempt
-def add_history(request):
-    if request.method != "POST":
-        return JsonResponse({"error": "Invalid method"}, status=405)
-
-    try:
-        data = request.POST if request.POST else json.loads(request.body or "{}")
-
-        user_id = int(data.get("user_id", 0))
-        movie_id = data.get("movie_id")
-        title = data.get("title", "")
-        poster = data.get("poster", "")
-
-        if not user_id or not movie_id:
-            return JsonResponse({"error": "Missing data"}, status=400)
-
-        History.objects.update_or_create(
-            user_id=user_id,
-            movie_id=movie_id,
-            defaults={"title": title, "poster": poster}
-        )
-
-        return JsonResponse({"message": "saved"})
-
-    except Exception as e:
-        return JsonResponse({"error": str(e)}, status=400)
-
-
-def get_history(request, user_id):
-    try:
-        data = list(
-            History.objects.filter(user_id=int(user_id))
-            .order_by("-id")
-            .values()
-        )
-        return JsonResponse(data, safe=False)
-    except Exception as e:
-        return JsonResponse({"error": str(e)}, status=400)
-
 # ---------------- CONTINUE WATCHING ----------------
 @csrf_exempt
 def add_history(request):
