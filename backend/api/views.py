@@ -9,7 +9,7 @@ from django.db.models import Count
 
 def most_watched(request, user_id=None):
     try:
-        print("USER ID RECEIVED:", user_id)  # 🔥 DEBUG
+        print("USER ID RECEIVED:", user_id)  #DEBUG
 
         if user_id is not None:
             data = (
@@ -74,7 +74,7 @@ def get_users(request):
     try:
         users = list(
             User.objects
-            .filter(is_admin=False)   # 🔥 hide admin
+            .filter(is_admin=False)   #hide admin
             .values("id", "email")
         )
         return JsonResponse(users, safe=False)
@@ -83,33 +83,93 @@ def get_users(request):
         return JsonResponse({"error": str(e)})
 
 
+from django.views.decorators.csrf import csrf_exempt
+from django.http import JsonResponse
+from .models import Wishlist, History
+
+
 # ---------------- WISHLIST ----------------
 @csrf_exempt
-def add_wishlist(request):
+def toggle_wishlist(request):
+    if request.method != "POST":
+        return JsonResponse({"error": "Invalid method"}, status=405)
+
     try:
-        data = json.loads(request.body)
-        Wishlist.objects.create(**data)
-        return JsonResponse({"message": "added"})
+        data = request.POST if request.POST else json.loads(request.body or "{}")
+
+        user_id = int(data.get("user_id", 0))
+        movie_id = data.get("movie_id")
+        title = data.get("title", "")
+        poster = data.get("poster", "")
+
+        if not user_id or not movie_id:
+            return JsonResponse({"error": "Missing data"}, status=400)
+
+        obj = Wishlist.objects.filter(user_id=user_id, movie_id=movie_id).first()
+
+        if obj:
+            obj.delete()
+            return JsonResponse({"message": "removed"})
+        else:
+            Wishlist.objects.create(
+                user_id=user_id,
+                movie_id=movie_id,
+                title=title,
+                poster=poster
+            )
+            return JsonResponse({"message": "added"})
+
     except Exception as e:
-        return JsonResponse({"error": str(e)})
+        return JsonResponse({"error": str(e)}, status=400)
 
 
 def get_wishlist(request, user_id):
-    data = list(Wishlist.objects.filter(user_id=user_id).values())
-    return JsonResponse(data, safe=False)
+    try:
+        data = list(Wishlist.objects.filter(user_id=int(user_id)).values())
+        return JsonResponse(data, safe=False)
+    except Exception as e:
+        return JsonResponse({"error": str(e)}, status=400)
 
 
+# ---------------- HISTORY ----------------
 @csrf_exempt
-def remove_wishlist(request):
-    data = json.loads(request.body)
+def add_history(request):
+    if request.method != "POST":
+        return JsonResponse({"error": "Invalid method"}, status=405)
 
-    Wishlist.objects.filter(
-        user_id=data["user_id"],
-        movie_id=data["movie_id"]
-    ).delete()
+    try:
+        data = request.POST if request.POST else json.loads(request.body or "{}")
 
-    return JsonResponse({"message": "removed"})
+        user_id = int(data.get("user_id", 0))
+        movie_id = data.get("movie_id")
+        title = data.get("title", "")
+        poster = data.get("poster", "")
 
+        if not user_id or not movie_id:
+            return JsonResponse({"error": "Missing data"}, status=400)
+
+        History.objects.update_or_create(
+            user_id=user_id,
+            movie_id=movie_id,
+            defaults={"title": title, "poster": poster}
+        )
+
+        return JsonResponse({"message": "saved"})
+
+    except Exception as e:
+        return JsonResponse({"error": str(e)}, status=400)
+
+
+def get_history(request, user_id):
+    try:
+        data = list(
+            History.objects.filter(user_id=int(user_id))
+            .order_by("-id")
+            .values()
+        )
+        return JsonResponse(data, safe=False)
+    except Exception as e:
+        return JsonResponse({"error": str(e)}, status=400)
 
 # ---------------- CONTINUE WATCHING ----------------
 @csrf_exempt
@@ -117,40 +177,58 @@ def add_history(request):
     try:
         data = json.loads(request.body)
 
+        user_id = int(data.get("user_id"))
+        movie_id = data.get("movie_id")
+        title = data.get("title")
+        poster = data.get("poster")
+
+        if not user_id or not movie_id:
+            return JsonResponse({"error": "Missing data"}, status=400)
+
         History.objects.update_or_create(
-            user_id=data["user_id"],
-            movie_id=data["movie_id"],
+            user_id=user_id,
+            movie_id=movie_id,
             defaults={
-                "title": data["title"],
-                "poster": data["poster"]
+                "title": title,
+                "poster": poster
             }
         )
 
         return JsonResponse({"message": "saved"})
 
     except Exception as e:
-        return JsonResponse({"error": str(e)})
+        return JsonResponse({"error": str(e)}, status=400)
 
 
 def get_history(request, user_id):
-    data = list(
-        History.objects.filter(user_id=user_id)
-        .order_by("-id")
-        .values()
-    )
-    return JsonResponse(data, safe=False)
+    try:
+        data = list(
+            History.objects
+            .filter(user_id=user_id)
+            .order_by("-id")
+            .values()
+        )
+        return JsonResponse(data, safe=False)
+
+    except Exception as e:
+        return JsonResponse({"error": str(e)}, status=400)
 
 
 @csrf_exempt
 def remove_history(request):
-    data = json.loads(request.body)
+    try:
+        data = json.loads(request.body)
 
-    History.objects.filter(
-        user_id=data["user_id"],
-        movie_id=data["movie_id"]
-    ).delete()
+        History.objects.filter(
+            user_id=int(data.get("user_id")),
+            movie_id=data.get("movie_id")
+        ).delete()
 
-    return JsonResponse({"message": "removed"})
+        return JsonResponse({"message": "removed"})
+
+    except Exception as e:
+        return JsonResponse({"error": str(e)}, status=400)
+
 
 
 # ---------------- PROFILE ----------------

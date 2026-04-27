@@ -1,8 +1,7 @@
 import { useEffect, useState } from "react";
 import {
   getHistory,
-  removeFromHistory,
-  getLastWatched
+  removeFromHistory
 } from "../services/history";
 import "./Row.css";
 
@@ -15,27 +14,7 @@ function ContinueRow({ setSelectedMovie }) {
 
   const loadHistory = async () => {
     const data = await getHistory();
-
-    const last = getLastWatched();
-
-    let finalData = data;
-
-    if (last) {
-      const exists = data.find((m) => m.movie_id === last.id);
-
-      if (!exists) {
-        finalData = [
-          {
-            movie_id: last.id,
-            title: last.title,
-            poster: last.poster_path
-          },
-          ...data
-        ];
-      }
-    }
-
-    setMovies(finalData);
+    setMovies(data || []);
   };
 
   const handleRemove = async (movie) => {
@@ -68,21 +47,20 @@ function ContinueRow({ setSelectedMovie }) {
               </span>
 
               <img
-                src={
-                  movie.poster
-                    ? `https://image.tmdb.org/t/p/w500${movie.poster}`
-                    : "https://via.placeholder.com/300x450?text=No+Image"
-                }
-                alt={movie.title}
-                className="movie-card"
-                onClick={() =>
-                  setSelectedMovie({
-                    id: movie.movie_id,
-                    title: movie.title,
-                    poster_path: movie.poster
-                  })
-                }
-              />
+                  src={
+                    movie.poster
+                      ? `https://image.tmdb.org/t/p/w300${movie.poster}`
+                      : "https://via.placeholder.com/300x450?text=No+Image"
+                  }
+                  className="movie-card"
+                  onClick={() =>
+                    setSelectedMovie({
+                      id: movie.movie_id,
+                      title: movie.title,
+                      poster_path: movie.poster
+                    })
+                  }
+                />
 
               <p className="movie-title">{movie.title}</p>
             </div>

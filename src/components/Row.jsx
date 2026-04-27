@@ -6,19 +6,26 @@ function Row({ title, fetchUrl, search, setSelectedMovie }) {
   const [movies, setMovies] = useState([]);
   const [wishlistIds, setWishlistIds] = useState([]);
 
-  const API_KEY = import.meta.env.VITE_APP_TMDB_V3_API_KEY;
+  const API_KEY = "b139582166405f939e11217717f711f9";
 
   useEffect(() => {
     const fetchMovies = async () => {
-      const res = await fetch(
-        `https://api.themoviedb.org/3${fetchUrl}&api_key=${API_KEY}`
-      );
-      const data = await res.json();
-      setMovies(data.results || []);
+      try {
+        const url = fetchUrl.includes("?")
+          ? `https://api.themoviedb.org/3${fetchUrl}&api_key=${API_KEY}`
+          : `https://api.themoviedb.org/3${fetchUrl}?api_key=${API_KEY}`;
+
+        const res = await fetch(url);
+        const data = await res.json();
+
+        setMovies(data.results || []);
+      } catch (err) {
+        console.error(err);
+      }
     };
 
     fetchMovies();
-  }, [fetchUrl, API_KEY]);
+  }, [fetchUrl]);
 
   useEffect(() => {
     loadWishlist();
@@ -26,8 +33,7 @@ function Row({ title, fetchUrl, search, setSelectedMovie }) {
 
   const loadWishlist = async () => {
     const data = await getWishlist();
-    const ids = data.map((item) => item.movie_id);
-    setWishlistIds(ids);
+    setWishlistIds(data.map((m) => m.movie_id));
   };
 
   const handleWishlist = async (movie) => {
@@ -35,18 +41,13 @@ function Row({ title, fetchUrl, search, setSelectedMovie }) {
     loadWishlist();
   };
 
-  const filteredMovies = movies.filter((movie) =>
-    movie.title?.toLowerCase().includes(search?.toLowerCase() || "")
-  );
-
   return (
     <div style={{ marginLeft: "20px" }}>
       <h2>{title}</h2>
 
       <div className="row-scroll">
-        {filteredMovies.map((movie) => (
+        {movies.map((movie) => (
           <div key={movie.id} className="movie-wrapper">
-
             <span
               className="heart"
               onClick={(e) => {
@@ -58,15 +59,10 @@ function Row({ title, fetchUrl, search, setSelectedMovie }) {
             </span>
 
             <img
-              src={
-                movie.poster_path
-                  ? `https://image.tmdb.org/t/p/w500${movie.poster_path}`
-                  : "https://via.placeholder.com/300x450?text=No+Image"
-              }
+              src={`https://image.tmdb.org/t/p/w500${movie.poster_path}`}
               className="movie-card"
               onClick={() => setSelectedMovie(movie)}
             />
-
           </div>
         ))}
       </div>

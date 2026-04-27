@@ -6,7 +6,7 @@ function TrailerPage({ movie, setSelectedMovie }) {
   const [trailerId, setTrailerId] = useState("");
   const [loading, setLoading] = useState(true);
 
-  const API_KEY = import.meta.env.VITE_APP_TMDB_V3_API_KEY;
+  const API_KEY = "b139582166405f939e11217717f711f9"; // FIX
 
   useEffect(() => {
     const fetchTrailer = async () => {
@@ -83,3 +83,4 @@ function TrailerPage({ movie, setSelectedMovie }) {
 }
 
 export default TrailerPage;
+
