@@ -53,7 +53,7 @@ pipeline {
 
         stage('SonarQube Scan') {
             steps {
-                withSonarQubeEnv('sonarqube') {
+                withSonarQubeEnv('sonar') {   // ✅ fixed here
                     script {
                         def scannerHome = tool 'sonar-scanner'
                         sh """
