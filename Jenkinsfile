@@ -18,6 +18,7 @@ pipeline {
                 url: 'https://github.com/sweta-motar/Netflix-clone-main.git'
             }
         }
+        
 
         stage('Clean Old') {
             steps {
@@ -30,7 +31,7 @@ pipeline {
 
         stage('Build Docker Image') {
             steps {
-                withCredentials([string(credentialsId: 'tmdb-token', variable: 'API_KEY')]) {
+                withCredentials([string(credentialsId: 'TMDB_API_KEY', variable: 'API_KEY')]) {
                     sh '''
                     docker build --no-cache -t $IMAGE_NAME \
                     --build-arg TMDB_V3_API_KEY=$API_KEY \
@@ -44,22 +45,22 @@ pipeline {
         stage('Trivy Scan') {
             steps {
                 sh '''
-                trivy image --severity HIGH,CRITICAL $IMAGE_NAME
+                docker run --rm \
+                -v /var/run/docker.sock:/var/run/docker.sock \
+                aquasec/trivy image $IMAGE_NAME
                 '''
             }
         }
 
         stage('SonarQube Scan') {
             steps {
-                withSonarQubeEnv('sonarqube') {
+                withSonarQubeEnv('sonar') {
                     script {
                         def scannerHome = tool 'sonar-scanner'
                         sh """
                         ${scannerHome}/bin/sonar-scanner \
-                        -Dsonar.projectKey=netflix-clone \
-                        -Dsonar.sources=. \
-                        -Dsonar.host.url=http://host.docker.internal:9000 \
-                        -Dsonar.login=$SONAR_AUTH_TOKEN
+                        -Dsonar.projectKey=netflix \
+                        -Dsonar.sources=.
                         """
                     }
                 }
@@ -69,7 +70,6 @@ pipeline {
         stage('Deploy Container') {
             steps {
                 sh '''
-                docker rm -f $CONTAINER_NAME || true
                 docker run -d -p 8091:80 \
                 --name $CONTAINER_NAME \
                 $IMAGE_NAME
@@ -78,11 +78,11 @@ pipeline {
         }
     }
 
-    post {
-        success {
-            mail to: 'swetamotar@gmail.com',
-                 subject: 'Build Success ✅',
-                 body: """
+   post {
+    success {
+        mail to: 'swetamotar@gmail.com',
+             subject: 'Build Success ✅',
+             body: """
 Application is LIVE 🚀
 
 Frontend:
@@ -91,12 +91,12 @@ http://localhost:8091
 Build Number: ${env.BUILD_NUMBER}
 Jenkins: ${env.BUILD_URL}
 """
-        }
-
-        failure {
-            mail to: 'swetamotar@gmail.com',
-                 subject: 'Build Failed ❌',
-                 body: "Check logs: ${env.BUILD_URL}"
-        }
     }
+
+    failure {
+        mail to: 'swetamotar@gmail.com',
+             subject: 'Build Failed ❌',
+             body: "Check logs: ${env.BUILD_URL}"
+    }
+}
 }
