@@ -30,7 +30,7 @@ pipeline {
 
         stage('Build Docker Image') {
             steps {
-                withCredentials([string(credentialsId: 'tmdb-token', variable: 'API_KEY')]) {
+                withCredentials([string(credentialsId: 'TMDB_API_KEY', variable: 'API_KEY')]) {
                     sh '''
                     docker build --no-cache -t $IMAGE_NAME \
                     --build-arg TMDB_V3_API_KEY=$API_KEY \
