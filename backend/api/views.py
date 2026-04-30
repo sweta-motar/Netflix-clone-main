@@ -88,6 +88,12 @@ from django.http import JsonResponse
 from .models import Wishlist, History
 
 
+from django.http import JsonResponse
+from django.views.decorators.csrf import csrf_exempt
+import json
+from .models import Wishlist, History
+
+
 # ---------------- WISHLIST ----------------
 @csrf_exempt
 def toggle_wishlist(request):
@@ -95,12 +101,10 @@ def toggle_wishlist(request):
         return JsonResponse({"error": "Invalid method"}, status=405)
 
     try:
-        data = request.POST if request.POST else json.loads(request.body or "{}")
+        data = json.loads(request.body)
 
-        user_id = int(data.get("user_id", 0))
+        user_id = int(data.get("user_id"))
         movie_id = data.get("movie_id")
-        title = data.get("title", "")
-        poster = data.get("poster", "")
 
         if not user_id or not movie_id:
             return JsonResponse({"error": "Missing data"}, status=400)
@@ -114,8 +118,8 @@ def toggle_wishlist(request):
             Wishlist.objects.create(
                 user_id=user_id,
                 movie_id=movie_id,
-                title=title,
-                poster=poster
+                title=data.get("title", ""),
+                poster=data.get("poster", "")
             )
             return JsonResponse({"message": "added"})
 
@@ -125,12 +129,35 @@ def toggle_wishlist(request):
 
 def get_wishlist(request, user_id):
     try:
-        data = list(Wishlist.objects.filter(user_id=int(user_id)).values())
+        user_id = int(user_id)
+
+        data = list(
+            Wishlist.objects.filter(user_id=user_id).values()
+        )
+
         return JsonResponse(data, safe=False)
+
     except Exception as e:
         return JsonResponse({"error": str(e)}, status=400)
 
-# ---------------- CONTINUE WATCHING ----------------
+
+@csrf_exempt
+def remove_wishlist(request):
+    try:
+        data = json.loads(request.body)
+
+        Wishlist.objects.filter(
+            user_id=int(data.get("user_id")),
+            movie_id=data.get("movie_id")
+        ).delete()
+
+        return JsonResponse({"message": "removed"})
+
+    except Exception as e:
+        return JsonResponse({"error": str(e)}, status=400)
+
+
+# ---------------- continue watching----------------
 @csrf_exempt
 def add_history(request):
     try:
@@ -138,8 +165,6 @@ def add_history(request):
 
         user_id = int(data.get("user_id"))
         movie_id = data.get("movie_id")
-        title = data.get("title")
-        poster = data.get("poster")
 
         if not user_id or not movie_id:
             return JsonResponse({"error": "Missing data"}, status=400)
@@ -148,8 +173,8 @@ def add_history(request):
             user_id=user_id,
             movie_id=movie_id,
             defaults={
-                "title": title,
-                "poster": poster
+                "title": data.get("title", ""),
+                "poster": data.get("poster", "")
             }
         )
 
@@ -161,12 +186,15 @@ def add_history(request):
 
 def get_history(request, user_id):
     try:
+        user_id = int(user_id)
+
         data = list(
             History.objects
             .filter(user_id=user_id)
             .order_by("-id")
             .values()
         )
+
         return JsonResponse(data, safe=False)
 
     except Exception as e:

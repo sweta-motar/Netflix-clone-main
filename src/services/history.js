@@ -1,42 +1,60 @@
-const API = import.meta.env.VITE_API_URL;
+const API = import.meta.env.VITE_API_URL || "http://localhost:8000/api";
 
 const getUserId = () => {
-  return localStorage.getItem("user_id")?.trim();
+  return localStorage.getItem("user_id")?.trim() || "1";
 };
 
 // ✅ GET HISTORY
 export const getHistory = async () => {
-  const user_id = getUserId();
+  try {
+    const user_id = getUserId();
 
-  const res = await fetch(`${API}/api/get-history/${user_id}/`);
-  return res.json();
+    const res = await fetch(`${API}/get-history/${user_id}/`);
+
+    if (!res.ok) throw new Error("Failed to fetch history");
+
+    return await res.json();
+  } catch (err) {
+    console.error("History Error:", err);
+    return [];
+  }
 };
 
 // ✅ ADD HISTORY
 export const saveWatch = async (movie) => {
-  const user_id = getUserId() || 1; // FIX: DEFAULT TO 1 FOR TESTING
+  try {
+    const user_id = getUserId();
 
-  localStorage.setItem("lastWatched", JSON.stringify(movie));
-
-  await fetch(`${API}/api/add-history/`, {
-    method: "POST",
-    headers: { "Content-Type": "application/json" },
-    body: JSON.stringify({
-      user_id,
-      movie_id: movie.id,
-      title: movie.title,
-      poster: movie.poster_path,
-    }),
-  });
+    await fetch(`${API}/add-history/`, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({
+        user_id,
+        movie_id: movie.id,
+        title: movie.title,
+        poster: movie.poster_path,
+      }),
+    });
+  } catch (err) {
+    console.error("Save History Error:", err);
+  }
 };
 
-// ✅ REMOVE HISTORY (THIS WAS MISSING ❗)
+// ✅ REMOVE HISTORY
 export const removeFromHistory = async (movie_id) => {
-  const user_id = getUserId();
+  try {
+    const user_id = getUserId();
 
-  await fetch(`${API}/api/remove-history/`, {
-    method: "POST",
-    headers: { "Content-Type": "application/json" },
-    body: JSON.stringify({ user_id, movie_id }),
-  });
+    await fetch(`${API}/remove-history/`, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({ user_id, movie_id }),
+    });
+  } catch (err) {
+    console.error("Remove History Error:", err);
+  }
 };

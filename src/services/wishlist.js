@@ -1,37 +1,60 @@
-const API = import.meta.env.VITE_API_URL;
+const API = import.meta.env.VITE_API_URL || "http://localhost:8000/api";
 
 const getUserId = () => {
-  return localStorage.getItem("user_id")?.trim();
+  return localStorage.getItem("user_id")?.trim() || "1";
 };
 
+// ✅ GET WISHLIST
 export const getWishlist = async () => {
-  const user_id = getUserId() || 1; // FIX: DEFAULT TO 1 FOR TESTING
+  try {
+    const user_id = getUserId();
 
-  const res = await fetch(`${API}/api/get-wishlist/${user_id}/`);
-  return res.json();
+    const res = await fetch(`${API}/get-wishlist/${user_id}/`);
+
+    if (!res.ok) throw new Error("Failed to fetch wishlist");
+
+    return await res.json();
+  } catch (err) {
+    console.error("Wishlist Error:", err);
+    return [];
+  }
 };
 
+// ✅ ADD TO WISHLIST
 export const toggleWishlist = async (movie) => {
-  const user_id = getUserId();
+  try {
+    const user_id = getUserId();
 
-  await fetch(`${API}/api/add-wishlist/`, {   // ✅ FIXED ENDPOINT
-    method: "POST",
-    headers: { "Content-Type": "application/json" },
-    body: JSON.stringify({
-      user_id,
-      movie_id: movie.id,
-      title: movie.title,
-      poster: movie.poster_path,   // ✅ MATCH BACKEND
-    }),
-  });
+    await fetch(`${API}/add-wishlist/`, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({
+        user_id,
+        movie_id: movie.id,
+        title: movie.title,
+        poster: movie.poster_path,
+      }),
+    });
+  } catch (err) {
+    console.error("Add Wishlist Error:", err);
+  }
 };
 
+// ✅ REMOVE FROM WISHLIST
 export const removeFromWishlist = async (movie_id) => {
-  const user_id = getUserId();
+  try {
+    const user_id = getUserId();
 
-  await fetch(`${API}/api/remove-wishlist/`, {
-    method: "POST",
-    headers: { "Content-Type": "application/json" },
-    body: JSON.stringify({ user_id, movie_id }),
-  });
+    await fetch(`${API}/remove-wishlist/`, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({ user_id, movie_id }),
+    });
+  } catch (err) {
+    console.error("Remove Wishlist Error:", err);
+  }
 };

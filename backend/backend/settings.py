@@ -5,7 +5,11 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 SECRET_KEY = 'django-insecure-+o#vc#8r9ykcer92j3_-bkd02g72^kk0#30c!h#_c9*b*grnkg'
 DEBUG = True
 
-ALLOWED_HOSTS = ['*']
+ALLOWED_HOSTS = [
+    "localhost",
+    "127.0.0.1",
+    "host.docker.internal",
+]
 
 INSTALLED_APPS = [
     'corsheaders',
