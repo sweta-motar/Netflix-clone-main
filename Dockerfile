@@ -3,16 +3,22 @@ FROM node:18-alpine AS builder
 
 WORKDIR /app
 
+# install dependencies
 COPY package*.json ./
 RUN npm install
 
-# ✅ copy .env so Vite can read it
-COPY .env .env
+# 🔥 use build arguments instead of .env
+ARG TMDB_V3_API_KEY
+ARG VITE_API_URL
+
+# set environment variables for Vite
+ENV VITE_APP_TMDB_V3_API_KEY=$TMDB_V3_API_KEY
+ENV VITE_API_URL=$VITE_API_URL
 
 # copy project files
 COPY . .
 
-# ✅ build project (Vite reads env here)
+# build project
 RUN npm run build
 
 
@@ -23,6 +29,7 @@ WORKDIR /usr/share/nginx/html
 
 RUN rm -rf ./*
 
+# copy build output
 COPY --from=builder /app/dist .
 
 EXPOSE 80
