@@ -34,7 +34,7 @@ pipeline {
                     sh '''
                     docker build --no-cache -t $IMAGE_NAME \
                     --build-arg TMDB_V3_API_KEY=$API_KEY \
-                    --build-arg VITE_API_URL=http://host.docker.internal:8000 \
+                    --build-arg VITE_API_URL=http://localhost:8000 \
                     .
                     '''
                 }
@@ -53,7 +53,7 @@ pipeline {
 
         stage('SonarQube Scan') {
             steps {
-                withSonarQubeEnv('sonar') {   // ✅ fixed here
+                withSonarQubeEnv('sonar') {
                     script {
                         def scannerHome = tool 'sonar-scanner'
                         sh """
