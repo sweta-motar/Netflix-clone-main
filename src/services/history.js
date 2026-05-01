@@ -9,7 +9,7 @@ export const getHistory = async () => {
   try {
     const user_id = getUserId();
 
-    const res = await fetch(`${API}/get-history/${user_id}/`);
+    const res = await fetch(`${API}/get-history/${user_id}/`); // ✅ added trailing /
 
     if (!res.ok) throw new Error("Failed to fetch history");
 
@@ -25,7 +25,7 @@ export const saveWatch = async (movie) => {
   try {
     const user_id = getUserId();
 
-    await fetch(`${API}/add-history/`, {
+    await fetch(`${API}/add-history/`, { // ✅ trailing /
       method: "POST",
       headers: {
         "Content-Type": "application/json",
@@ -47,7 +47,7 @@ export const removeFromHistory = async (movie_id) => {
   try {
     const user_id = getUserId();
 
-    await fetch(`${API}/remove-history/`, {
+    await fetch(`${API}/remove-history/`, { // ✅ trailing /
       method: "POST",
       headers: {
         "Content-Type": "application/json",

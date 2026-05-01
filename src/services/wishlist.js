@@ -9,7 +9,7 @@ export const getWishlist = async () => {
   try {
     const user_id = getUserId();
 
-    const res = await fetch(`${API}/get-wishlist/${user_id}/`);
+    const res = await fetch(`${API}/get-wishlist/${user_id}/`); // ✅ trailing /
 
     if (!res.ok) throw new Error("Failed to fetch wishlist");
 
@@ -25,7 +25,7 @@ export const toggleWishlist = async (movie) => {
   try {
     const user_id = getUserId();
 
-    await fetch(`${API}/add-wishlist/`, {
+    await fetch(`${API}/add-wishlist/`, { // ✅ trailing /
       method: "POST",
       headers: {
         "Content-Type": "application/json",
@@ -47,7 +47,7 @@ export const removeFromWishlist = async (movie_id) => {
   try {
     const user_id = getUserId();
 
-    await fetch(`${API}/remove-wishlist/`, {
+    await fetch(`${API}/remove-wishlist/`, { // ✅ trailing /
       method: "POST",
       headers: {
         "Content-Type": "application/json",
