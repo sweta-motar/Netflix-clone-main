@@ -10,7 +10,6 @@
   font-size: 40px;
 }
 
-/* 🎬 GRID */
 .profiles {
   display: flex;
   justify-content: center;
@@ -19,7 +18,38 @@
   flex-wrap: wrap;
 }
 
-/* 🎬 PROFILE CARD */
+/* wrapper for buttons */
+.profile-card-wrapper {
+  position: relative;
+}
+
+/* DELETE BUTTON */
+.delete-btn {
+  position: absolute;
+  top: -10px;
+  right: -10px;
+  background: red;
+  color: white;
+  border-radius: 50%;
+  padding: 5px 8px;
+  cursor: pointer;
+  z-index: 2;
+}
+
+/* EDIT BUTTON */
+.edit-btn {
+  position: absolute;
+  top: -10px;
+  left: -10px;
+  background: #333;
+  color: white;
+  border-radius: 50%;
+  padding: 5px 8px;
+  cursor: pointer;
+  z-index: 2;
+}
+
+/* PROFILE CARD */
 .profile-card {
   cursor: pointer;
   transition: transform 0.3s;
@@ -28,7 +58,6 @@
 .profile-card img {
   width: 130px;
   height: 130px;
-  object-fit: cover;
   border-radius: 8px;
 }
 
@@ -40,7 +69,7 @@
   margin-top: 10px;
 }
 
-/* ➕ ADD PROFILE */
+/* ADD PROFILE */
 .profile-card.add {
   display: flex;
   flex-direction: column;
@@ -58,38 +87,8 @@
   border-radius: 8px;
 }
 
-/* 🔥 CLICK ANIMATION */
-.profile-card:active {
-  transform: scale(0.9);
-  opacity: 0.7;
-}
-
-/* ❌ DELETE */
-.delete-btn {
-  position: absolute;
-  top: 5px;
-  right: 5px;
-  background: red;
-  padding: 4px 6px;
-  border-radius: 50%;
-  font-size: 12px;
-  cursor: pointer;
-}
-
-/* ✏️ EDIT */
-.edit-btn {
-  position: absolute;
-  top: 5px;
-  left: 5px;
-  background: #444;
-  padding: 4px 6px;
-  border-radius: 50%;
-  font-size: 12px;
-  cursor: pointer;
-}
-
-/* MODAL */
-.modal {
+/* ✅ MODAL CENTER */
+.modal-overlay {
   position: fixed;
   top: 0;
   left: 0;
@@ -101,23 +100,30 @@
   align-items: center;
 }
 
-.modal-box {
+.modal {
   background: #222;
   padding: 30px;
-  border-radius: 8px;
+  border-radius: 10px;
   width: 300px;
 }
 
-.modal-box input {
+.modal input {
   width: 100%;
   padding: 10px;
-  margin: 10px 0;
+  margin-top: 15px;
   background: #333;
   border: none;
   color: white;
 }
 
-.modal-actions {
+.modal-buttons {
   display: flex;
   justify-content: space-between;
+  margin-top: 20px;
+}
+
+.modal-buttons button {
+  padding: 8px 15px;
+  border: none;
+  cursor: pointer;
 }

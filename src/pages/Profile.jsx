@@ -1,16 +1,11 @@
 import { useState, useEffect } from "react";
 import "./Profile.css";
 
-const API = "http://127.0.0.1:8000/api";
-
 function Profile({ setProfile }) {
   const [profiles, setProfiles] = useState([]);
   const [showModal, setShowModal] = useState(false);
-  const [editMode, setEditMode] = useState(false);
-  const [currentProfile, setCurrentProfile] = useState(null);
-
   const [name, setName] = useState("");
-  const [avatar, setAvatar] = useState("");
+  const [editing, setEditing] = useState(null);
 
   useEffect(() => {
     loadProfiles();
@@ -18,85 +13,62 @@ function Profile({ setProfile }) {
 
   const loadProfiles = async () => {
     const user_id = localStorage.getItem("user_id");
-    try {
-      const res = await fetch(`${API}/profiles/${user_id}/`);
-      const data = await res.json();
-      setProfiles(data);
-    } catch (err) {
-      console.error("Error loading profiles:", err);
-    }
+
+    const res = await fetch(
+      `http://127.0.0.1:8000/api/profiles/${user_id}/`
+    );
+    const data = await res.json();
+    setProfiles(data);
   };
 
-  // ➕ OPEN ADD MODAL
-  const openAdd = () => {
-    setEditMode(false);
-    setName("");
-    setAvatar("");
-    setShowModal(true);
-  };
-
-  // ✏️ OPEN EDIT MODAL
-  const openEdit = (profile) => {
-    setEditMode(true);
-    setCurrentProfile(profile);
-    setName(profile.name);
-    setAvatar(profile.avatar);
-    setShowModal(true);
-  };
-
-  // 💾 SAVE (ADD / EDIT)
-  const handleSave = async () => {
+  // ➕ ADD / EDIT PROFILE
+  const saveProfile = async () => {
     const user_id = localStorage.getItem("user_id");
 
-    try {
-      if (editMode) {
-        await fetch(`${API}/update-profile/`, {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({
-            id: currentProfile.id,
-            user_id,
-            name,
-            avatar,
-          }),
-        });
-      } else {
-        await fetch(`${API}/add-profile/`, {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({
-            user_id,
-            name,
-            avatar: avatar || `https://i.pravatar.cc/150?u=${name}`,
-            is_kid: false,
-          }),
-        });
-      }
+    const avatar = `https://i.pravatar.cc/150?u=${name}`; // ✅ auto avatar
 
-      setShowModal(false);
-      loadProfiles();
-    } catch (err) {
-      console.error("Save Error:", err);
-    }
-  };
-
-  // ❌ DELETE PROFILE
-  const handleDelete = async (profileId) => {
-    const user_id = localStorage.getItem("user_id");
-
-    if (!window.confirm("Delete this profile?")) return;
-
-    try {
-      await fetch(`${API}/delete-profile/`, {
+    if (editing) {
+      await fetch("http://127.0.0.1:8000/api/update-profile/", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ id: profileId, user_id }),
+        body: JSON.stringify({
+          id: editing.id,
+          user_id,
+          name,
+          avatar
+        })
       });
-
-      setProfiles((prev) => prev.filter((p) => p.id !== profileId));
-    } catch (err) {
-      console.error("Delete Error:", err);
+    } else {
+      await fetch("http://127.0.0.1:8000/api/add-profile/", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          user_id,
+          name,
+          avatar
+        })
+      });
     }
+
+    setShowModal(false);
+    setName("");
+    setEditing(null);
+    loadProfiles();
+  };
+
+  // ❌ DELETE
+  const deleteProfile = async (id) => {
+    const user_id = localStorage.getItem("user_id");
+
+    await fetch("http://127.0.0.1:8000/api/delete-profile/", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json"
+      },
+      body: JSON.stringify({ id, user_id })
+    });
+
+    loadProfiles();
   };
 
   return (
@@ -105,71 +77,69 @@ function Profile({ setProfile }) {
 
       <div className="profiles">
         {profiles.map((p) => (
-          <div
-            key={p.id}
-            className="profile-card"
-            onClick={() => {
-              localStorage.setItem("profile", JSON.stringify(p));
-              localStorage.setItem("profile_id", p.id);
-              setProfile(p);
-            }}
-          >
-            {/* ❌ DELETE */}
-            <span
+          <div key={p.id} className="profile-card-wrapper">
+
+            {/* ❌ DELETE BUTTON */}
+            <div
               className="delete-btn"
               onClick={(e) => {
                 e.stopPropagation();
-                handleDelete(p.id);
+                deleteProfile(p.id);
               }}
             >
-              ✕
-            </span>
+              ✖
+            </div>
 
-            {/* ✏️ EDIT */}
-            <span
+            {/* ✏️ EDIT BUTTON */}
+            <div
               className="edit-btn"
               onClick={(e) => {
                 e.stopPropagation();
-                openEdit(p);
+                setEditing(p);
+                setName(p.name);
+                setShowModal(true);
               }}
             >
-              ✏
-            </span>
+              ✏️
+            </div>
 
-            <img src={p.avatar} alt="" />
-            <p>{p.name}</p>
+            <div
+              className="profile-card"
+              onClick={() => {
+                localStorage.setItem("profile", JSON.stringify(p));
+                setProfile(p);
+              }}
+            >
+              <img src={p.avatar} alt="" />
+              <p>{p.name}</p>
+            </div>
           </div>
         ))}
 
         {/* ➕ ADD */}
-        <div className="profile-card add" onClick={openAdd}>
+        <div
+          className="profile-card add"
+          onClick={() => setShowModal(true)}
+        >
           <div className="add-icon">+</div>
           <p>Add Profile</p>
         </div>
       </div>
 
-      {/* 🧾 MODAL */}
+      {/* ✅ MODAL CENTER FIX */}
       {showModal && (
-        <div className="modal">
-          <div className="modal-box">
-            <h2>{editMode ? "Edit Profile" : "Add Profile"}</h2>
+        <div className="modal-overlay">
+          <div className="modal">
+            <h2>{editing ? "Edit Profile" : "Add Profile"}</h2>
 
             <input
-              type="text"
               placeholder="Profile Name"
               value={name}
               onChange={(e) => setName(e.target.value)}
             />
 
-            <input
-              type="text"
-              placeholder="Avatar URL (optional)"
-              value={avatar}
-              onChange={(e) => setAvatar(e.target.value)}
-            />
-
-            <div className="modal-actions">
-              <button onClick={handleSave}>Save</button>
+            <div className="modal-buttons">
+              <button onClick={saveProfile}>Save</button>
               <button onClick={() => setShowModal(false)}>Cancel</button>
             </div>
           </div>
