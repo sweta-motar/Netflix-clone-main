@@ -5,8 +5,20 @@ function Login({ setUser }) {
   const [isSignup, setIsSignup] = useState(false);
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
+  const [showPassword, setShowPassword] = useState(false);
+
+  // ✅ Alphanumeric validation
+  const isValidPassword = (pwd) => {
+    return /^[a-zA-Z0-9]+$/.test(pwd);
+  };
 
   const handleAuth = async () => {
+    // 🔒 Validate password before API call
+    if (!isValidPassword(password)) {
+      alert("Password must be alphanumeric (no special characters)");
+      return;
+    }
+
     const url = isSignup
       ? "http://127.0.0.1:8000/api/signup/"
       : "http://127.0.0.1:8000/api/login/";
@@ -49,17 +61,33 @@ function Login({ setUser }) {
           onChange={(e) => setEmail(e.target.value)}
         />
 
-        <input
-          type="password"
-          placeholder="Password"
-          onChange={(e) => setPassword(e.target.value)}
-        />
+        {/* 🔐 Password + Show/Hide */}
+        <div style={{ position: "relative" }}>
+          <input
+            type={showPassword ? "text" : "password"}
+            placeholder="Password (Alphanumeric only)"
+            onChange={(e) => setPassword(e.target.value)}
+          />
+
+          <span
+            onClick={() => setShowPassword(!showPassword)}
+            style={{
+              position: "absolute",
+              right: "10px",
+              top: "12px",
+              cursor: "pointer",
+              fontSize: "12px",
+              color: "gray"
+            }}
+          >
+            {showPassword ? "Hide" : "Show"}
+          </span>
+        </div>
 
         <button onClick={handleAuth}>
           {isSignup ? "Sign Up" : "Sign In"}
         </button>
 
-        {/* 🔁 NORMAL SWITCH */}
         <p className="switch">
           {isSignup
             ? "Already have an account? "
