@@ -1,9 +1,9 @@
 from django.db import models
 
 class User(models.Model):
-    email = models.EmailField()
+    email = models.EmailField(unique=True)  # ✅ prevent duplicate users
     password = models.CharField(max_length=100)
-    is_admin = models.BooleanField(default=False)  # ✅ ADD THIS
+    is_admin = models.BooleanField(default=False)
 
 
 class Wishlist(models.Model):
@@ -21,7 +21,7 @@ class History(models.Model):
 
 
 class Profile(models.Model):
-    user_id = models.IntegerField(null=True)   # 🔥 FIX FOR MIGRATION ISSUE
+    user_id = models.IntegerField(null=True)
     name = models.CharField(max_length=100)
     avatar = models.TextField(blank=True)
     is_kid = models.BooleanField(default=False)
