@@ -22,6 +22,7 @@ urlpatterns = [
     path("profiles/<int:user_id>/", views.get_profiles),
     path("add-profile/", views.create_profile),
     path("delete-profile/", views.delete_profile),
+    path("update-profile/", views.update_profile),
 
     # ANALYTICS
        #path("analytics/", views.most_watched),             # all users

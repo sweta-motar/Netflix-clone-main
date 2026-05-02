@@ -107,6 +107,20 @@ def delete_profile(request):
     except Exception as e:
         return JsonResponse({"error": str(e)})
 
+    @csrf_exempt
+def update_profile(request):
+    data = json.loads(request.body)
+
+    Profile.objects.filter(
+        id=data["id"],
+        user_id=data["user_id"]
+    ).update(
+        name=data["name"],
+        avatar=data["avatar"]
+    )
+
+    return JsonResponse({"message": "updated"})
+
 
 # ---------------- WISHLIST ---------------- #
 
