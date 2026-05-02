@@ -3,6 +3,13 @@ from django.http import JsonResponse
 from django.views.decorators.csrf import csrf_exempt
 from .models import User, Wishlist, History, Profile
 
+# ✅ OPTIONAL JWT (simple, safe)
+try:
+    from rest_framework_simplejwt.tokens import RefreshToken
+    JWT_ENABLED = True
+except:
+    JWT_ENABLED = False
+
 
 # ---------------- AUTH ---------------- #
 
@@ -11,7 +18,6 @@ def signup(request):
     try:
         data = json.loads(request.body)
 
-        # prevent duplicate user
         if User.objects.filter(email=data["email"]).exists():
             return JsonResponse({"error": "User already exists"}, status=400)
 
@@ -39,13 +45,26 @@ def login(request):
         if not user:
             return JsonResponse({"error": "Invalid credentials"}, status=400)
 
-        return JsonResponse({
+        response = {
             "user_id": user.id,
             "is_admin": user.is_admin
-        })
+        }
+
+        # ✅ Add token if JWT installed
+        if JWT_ENABLED:
+            refresh = RefreshToken.for_user(user)
+            response["token"] = str(refresh.access_token)
+
+        return JsonResponse(response)
 
     except Exception as e:
         return JsonResponse({"error": str(e)})
+
+
+# ✅ FIXED MISSING FUNCTION (IMPORTANT)
+def get_users(request):
+    users = User.objects.all().values()
+    return JsonResponse(list(users), safe=False)
 
 
 # ---------------- PROFILE ---------------- #
@@ -80,7 +99,7 @@ def delete_profile(request):
 
         Profile.objects.filter(
             id=data["id"],
-            user_id=data.get("user_id")  # safety: delete only own profile
+            user_id=data.get("user_id")
         ).delete()
 
         return JsonResponse({"message": "deleted"})
