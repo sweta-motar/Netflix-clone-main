@@ -1,3 +1,4 @@
+/* MAIN PAGE */
 .profile {
   background: #141414;
   height: 100vh;
@@ -10,6 +11,7 @@
   font-size: 40px;
 }
 
+/* GRID */
 .profiles {
   display: flex;
   justify-content: center;
@@ -18,46 +20,61 @@
   flex-wrap: wrap;
 }
 
-/* wrapper for buttons */
+/* WRAPPER */
 .profile-card-wrapper {
   position: relative;
 }
 
-/* DELETE BUTTON */
-.delete-btn {
+/* 🔥 BUTTONS (HIDDEN BY DEFAULT) */
+.delete-btn,
+.edit-btn {
   position: absolute;
-  top: -10px;
-  right: -10px;
-  background: red;
+  opacity: 0;
+  transition: all 0.3s ease;
+  background: rgba(255, 255, 255, 0.2);
+  backdrop-filter: blur(6px);
   color: white;
   border-radius: 50%;
-  padding: 5px 8px;
+  padding: 6px 9px;
   cursor: pointer;
+  font-size: 14px;
   z-index: 2;
 }
 
-/* EDIT BUTTON */
+/* POSITION */
+.delete-btn {
+  top: 6px;
+  right: 6px;
+}
+
 .edit-btn {
-  position: absolute;
-  top: -10px;
-  left: -10px;
-  background: #333;
-  color: white;
-  border-radius: 50%;
-  padding: 5px 8px;
-  cursor: pointer;
-  z-index: 2;
+  top: 6px;
+  left: 6px;
+}
+
+/* SHOW ON HOVER */
+.profile-card-wrapper:hover .delete-btn,
+.profile-card-wrapper:hover .edit-btn {
+  opacity: 1;
+}
+
+/* HOVER EFFECT */
+.delete-btn:hover,
+.edit-btn:hover {
+  background: rgba(255, 255, 255, 0.4);
+  transform: scale(1.1);
 }
 
 /* PROFILE CARD */
 .profile-card {
   cursor: pointer;
-  transition: transform 0.3s;
+  transition: transform 0.3s ease;
 }
 
 .profile-card img {
   width: 130px;
   height: 130px;
+  object-fit: cover;
   border-radius: 8px;
 }
 
@@ -87,7 +104,13 @@
   border-radius: 8px;
 }
 
-/* ✅ MODAL CENTER */
+/* CLICK EFFECT */
+.profile-card:active {
+  transform: scale(0.9);
+  opacity: 0.7;
+}
+
+/* 🔥 MODAL CENTER FIX */
 .modal-overlay {
   position: fixed;
   top: 0;
@@ -98,6 +121,7 @@
   display: flex;
   justify-content: center;
   align-items: center;
+  z-index: 100;
 }
 
 .modal {
@@ -105,6 +129,11 @@
   padding: 30px;
   border-radius: 10px;
   width: 300px;
+  text-align: center;
+}
+
+.modal h2 {
+  margin-bottom: 15px;
 }
 
 .modal input {
@@ -113,6 +142,7 @@
   margin-top: 15px;
   background: #333;
   border: none;
+  border-radius: 5px;
   color: white;
 }
 
@@ -126,4 +156,15 @@
   padding: 8px 15px;
   border: none;
   cursor: pointer;
+  border-radius: 5px;
+}
+
+.modal-buttons button:first-child {
+  background: red;
+  color: white;
+}
+
+.modal-buttons button:last-child {
+  background: gray;
+  color: white;
 }
