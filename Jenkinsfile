@@ -1,6 +1,5 @@
 pipeline {
 
-```
 agent {
     label 'docker'
 }
@@ -154,7 +153,6 @@ post {
              subject: 'Build Success ✅',
 
              body: """
-```
 
 Application deployed successfully 🚀
 
@@ -167,7 +165,6 @@ ${env.BUILD_URL}
 """
 }
 
-```
     failure {
 
         mail to: 'swetamotar@gmail.com',
@@ -175,13 +172,11 @@ ${env.BUILD_URL}
              subject: 'Build Failed ❌',
 
              body: """
-```
 
 Build failed.
 
 Check Jenkins Logs:
 ${env.BUILD_URL}
 """
-}
 }
 }
