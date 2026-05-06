@@ -1,5 +1,6 @@
 pipeline {
 
+```
 agent {
     label 'docker'
 }
@@ -14,7 +15,7 @@ triggers {
 }
 
 stages {
-    
+
     stage('Clone Code') {
         steps {
             git branch: 'main',
@@ -45,7 +46,10 @@ stages {
 
     stage('Build Docker Image') {
         steps {
-            withCredentials([string(credentialsId: 'TMDB_API_KEY', variable: 'API_KEY')]) {
+
+            withCredentials([
+                string(credentialsId: 'TMDB_API_KEY', variable: 'API_KEY')
+            ]) {
 
                 sh '''
                 #!/bin/bash
@@ -62,6 +66,7 @@ stages {
 
     stage('Trivy Scan') {
         steps {
+
             sh '''
             #!/bin/bash
 
@@ -92,14 +97,15 @@ stages {
     }
 
     stage('Docker Login') {
-
         steps {
 
-            withCredentials([usernamePassword(
-                credentialsId: 'dockerhub',
-                usernameVariable: 'DOCKER_USER',
-                passwordVariable: 'DOCKER_PASS'
-            )]) {
+            withCredentials([
+                usernamePassword(
+                    credentialsId: 'dockerhub',
+                    usernameVariable: 'DOCKER_USER',
+                    passwordVariable: 'DOCKER_PASS'
+                )
+            ]) {
 
                 sh '''
                 #!/bin/bash
@@ -124,7 +130,6 @@ stages {
     }
 
     stage('Deploy to Kubernetes') {
-
         steps {
 
             sh '''
