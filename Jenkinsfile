@@ -2,8 +2,7 @@ pipeline {
     agent any
 
     environment {
-        IMAGE_NAME = "netflix-clone"
-        CONTAINER_NAME = "netflix-container"
+        IMAGE_NAME = "swetamotar/netflix-clone:latest"
     }
 
     triggers {
@@ -19,10 +18,9 @@ pipeline {
             }
         }
 
-        stage('Clean Old') {
+        stage('Clean Old Images') {
             steps {
                 sh '''
-                docker rm -f $CONTAINER_NAME || true
                 docker rmi -f $IMAGE_NAME || true
                 '''
             }
@@ -34,7 +32,7 @@ pipeline {
                     sh '''
                     docker build --no-cache -t $IMAGE_NAME \
                     --build-arg TMDB_V3_API_KEY=$API_KEY \
-                    --build-arg VITE_API_URL=http://localhost:8000/api \
+                    --build-arg VITE_API_URL=http://192.168.49.2:30008/api \
                     .
                     '''
                 }
@@ -56,6 +54,7 @@ pipeline {
                 withSonarQubeEnv('sonar') {
                     script {
                         def scannerHome = tool 'sonar-scanner'
+
                         sh """
                         ${scannerHome}/bin/sonar-scanner \
                         -Dsonar.projectKey=netflix \
@@ -66,38 +65,66 @@ pipeline {
             }
         }
 
-        stage('Deploy Container') {
+        stage('Docker Login') {
+            steps {
+                withCredentials([usernamePassword(
+                    credentialsId: 'dockerhub',
+                    usernameVariable: 'DOCKER_USER',
+                    passwordVariable: 'DOCKER_PASS'
+                )]) {
+
+                    sh '''
+                    echo $DOCKER_PASS | docker login -u $DOCKER_USER --password-stdin
+                    '''
+                }
+            }
+        }
+
+        stage('Push Docker Image') {
             steps {
                 sh '''
-                docker rm -f $CONTAINER_NAME || true
-                docker rm -f vigorous_mclean || true
-                docker run -d -p 8091:80 \
-                --name $CONTAINER_NAME \
-                $IMAGE_NAME
+                docker push $IMAGE_NAME
+                '''
+            }
+        }
+
+        stage('Deploy to Kubernetes') {
+            steps {
+                sh '''
+                kubectl apply -f k8s/
+                kubectl rollout restart deployment frontend
+                kubectl rollout restart deployment backend
                 '''
             }
         }
     }
 
     post {
+
         success {
             mail to: 'swetamotar@gmail.com',
                  subject: 'Build Success ✅',
                  body: """
-Application is LIVE 🚀
+Application deployed successfully 🚀
 
-Frontend:
-http://localhost:8091
+Kubernetes Deployment Updated
 
 Build Number: ${env.BUILD_NUMBER}
-Jenkins: ${env.BUILD_URL}
+
+Jenkins:
+${env.BUILD_URL}
 """
         }
 
         failure {
             mail to: 'swetamotar@gmail.com',
                  subject: 'Build Failed ❌',
-                 body: "Check logs: ${env.BUILD_URL}"
+                 body: """
+Build failed.
+
+Check Jenkins Logs:
+${env.BUILD_URL}
+"""
         }
     }
 }
