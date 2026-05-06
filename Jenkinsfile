@@ -28,13 +28,15 @@ pipeline {
             }
         }
 
-        stage('Build Docker Image') {
+        stage('Build Docker Image (Minikube)') {
             steps {
                 withCredentials([string(credentialsId: 'TMDB_API_KEY', variable: 'API_KEY')]) {
                     sh '''
+                    eval $(minikube docker-env)
+
                     docker build --no-cache -t $IMAGE_NAME \
                     --build-arg TMDB_V3_API_KEY=$API_KEY \
-                    --build-arg VITE_API_URL=http://localhost:8000/api \
+                    --build-arg VITE_API_URL=http://192.168.49.2:30008/api \
                     .
                     '''
                 }
@@ -66,14 +68,12 @@ pipeline {
             }
         }
 
-        stage('Deploy Container') {
+        stage('Deploy to Kubernetes') {
             steps {
                 sh '''
-                docker rm -f $CONTAINER_NAME || true
-                docker rm -f vigorous_mclean || true
-                docker run -d -p 8091:80 \
-                --name $CONTAINER_NAME \
-                $IMAGE_NAME
+                kubectl apply -f k8s/
+                kubectl rollout restart deployment frontend
+                kubectl rollout restart deployment backend
                 '''
             }
         }
@@ -86,8 +86,8 @@ pipeline {
                  body: """
 Application is LIVE 🚀
 
-Frontend:
-http://localhost:8091
+Run:
+minikube service frontend
 
 Build Number: ${env.BUILD_NUMBER}
 Jenkins: ${env.BUILD_URL}

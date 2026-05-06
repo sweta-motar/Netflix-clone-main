@@ -3,7 +3,7 @@ from django.http import JsonResponse
 from django.views.decorators.csrf import csrf_exempt
 from .models import User, Wishlist, History, Profile
 
-# ✅ OPTIONAL JWT (simple, safe)
+# JWT optional
 try:
     from rest_framework_simplejwt.tokens import RefreshToken
     JWT_ENABLED = True
@@ -50,7 +50,6 @@ def login(request):
             "is_admin": user.is_admin
         }
 
-        # ✅ Add token if JWT installed
         if JWT_ENABLED:
             refresh = RefreshToken.for_user(user)
             response["token"] = str(refresh.access_token)
@@ -61,7 +60,6 @@ def login(request):
         return JsonResponse({"error": str(e)})
 
 
-# ✅ FIXED MISSING FUNCTION (IMPORTANT)
 def get_users(request):
     users = User.objects.all().values()
     return JsonResponse(list(users), safe=False)
@@ -107,19 +105,25 @@ def delete_profile(request):
     except Exception as e:
         return JsonResponse({"error": str(e)})
 
-    @csrf_exempt
+
+# ✅ FIXED PROPERLY (THIS WAS YOUR ERROR)
+@csrf_exempt
 def update_profile(request):
-    data = json.loads(request.body)
+    try:
+        data = json.loads(request.body)
 
-    Profile.objects.filter(
-        id=data["id"],
-        user_id=data["user_id"]
-    ).update(
-        name=data["name"],
-        avatar=data["avatar"]
-    )
+        Profile.objects.filter(
+            id=data["id"],
+            user_id=data["user_id"]
+        ).update(
+            name=data["name"],
+            avatar=data["avatar"]
+        )
 
-    return JsonResponse({"message": "updated"})
+        return JsonResponse({"message": "updated"})
+
+    except Exception as e:
+        return JsonResponse({"error": str(e)})
 
 
 # ---------------- WISHLIST ---------------- #

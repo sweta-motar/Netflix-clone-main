@@ -7,7 +7,7 @@ WORKDIR /app
 COPY package*.json ./
 RUN npm install
 
-# 🔥 use build arguments instead of .env
+# use build arguments instead of .env
 ARG TMDB_V3_API_KEY
 ARG VITE_API_URL
 
