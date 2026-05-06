@@ -15,7 +15,7 @@ triggers {
 }
 
 stages {
-
+    
     stage('Clone Code') {
         steps {
             git branch: 'main',
