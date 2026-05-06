@@ -21,7 +21,7 @@ pipeline {
         stage('Clean Old Images') {
             steps {
                 sh '''
-                docker rmi -f $IMAGE_NAME || true
+                sudo docker rmi -f $IMAGE_NAME || true
                 '''
             }
         }
@@ -30,7 +30,7 @@ pipeline {
             steps {
                 withCredentials([string(credentialsId: 'TMDB_API_KEY', variable: 'API_KEY')]) {
                     sh '''
-                    docker build --no-cache -t $IMAGE_NAME \
+                     sudo docker build --no-cache -t $IMAGE_NAME \
                     --build-arg TMDB_V3_API_KEY=$API_KEY \
                     --build-arg VITE_API_URL=http://192.168.49.2:30008/api \
                     .
@@ -42,7 +42,7 @@ pipeline {
         stage('Trivy Scan') {
             steps {
                 sh '''
-                docker run --rm \
+                sudo docker run --rm \
                 -v /var/run/docker.sock:/var/run/docker.sock \
                 aquasec/trivy image $IMAGE_NAME
                 '''
@@ -74,7 +74,7 @@ pipeline {
                 )]) {
 
                     sh '''
-                    echo $DOCKER_PASS | docker login -u $DOCKER_USER --password-stdin
+                    echo $DOCKER_PASS | sudo docker login -u $DOCKER_USER --password-stdin
                     '''
                 }
             }
@@ -83,7 +83,7 @@ pipeline {
         stage('Push Docker Image') {
             steps {
                 sh '''
-                docker push $IMAGE_NAME
+                sudo docker push $IMAGE_NAME
                 '''
             }
         }
