@@ -15,7 +15,7 @@ function Profile({ setProfile }) {
     const user_id = localStorage.getItem("user_id");
 
     const res = await fetch(
-      `http://127.0.0.1:8000/api/profiles/${user_id}/`
+      `${import.meta.env.VITE_API_URL}/profiles/${user_id}/`
     );
     const data = await res.json();
     setProfiles(data);
@@ -28,7 +28,7 @@ function Profile({ setProfile }) {
     const avatar = `https://i.pravatar.cc/150?u=${name}`; // ✅ auto avatar
 
     if (editing) {
-      await fetch("http://127.0.0.1:8000/api/update-profile/", {
+      await fetch(`${import.meta.env.VITE_API_URL}/update-profile/`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
@@ -39,7 +39,7 @@ function Profile({ setProfile }) {
         })
       });
     } else {
-      await fetch("http://127.0.0.1:8000/api/add-profile/", {
+      await fetch(`${import.meta.env.VITE_API_URL}/add-profile/`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
@@ -60,7 +60,7 @@ function Profile({ setProfile }) {
   const deleteProfile = async (id) => {
     const user_id = localStorage.getItem("user_id");
 
-    await fetch("http://127.0.0.1:8000/api/delete-profile/", {
+    await fetch(`${import.meta.env.VITE_API_URL}/delete-profile/`, {
       method: "POST",
       headers: {
         "Content-Type": "application/json"

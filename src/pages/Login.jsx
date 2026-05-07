@@ -7,21 +7,21 @@ function Login({ setUser }) {
   const [password, setPassword] = useState("");
   const [showPassword, setShowPassword] = useState(false);
 
-  // ✅ Alphanumeric validation
+  // Alphanumeric validation
   const isValidPassword = (pwd) => {
     return /^[a-zA-Z0-9]+$/.test(pwd);
   };
 
   const handleAuth = async () => {
-    // 🔒 Validate password before API call
+    // Validate password before API call
     if (!isValidPassword(password)) {
-      alert("Password must be alphanumeric (no special characters)");
+      alert("Enter valid  Password ");
       return;
     }
 
     const url = isSignup
-      ? "http://127.0.0.1:8000/api/signup/"
-      : "http://127.0.0.1:8000/api/login/";
+      ? import.meta.env.VITE_API_URL + "/signup/"
+      : import.meta.env.VITE_API_URL + "/login/";
 
     try {
       const res = await fetch(url, {
@@ -61,7 +61,7 @@ function Login({ setUser }) {
           onChange={(e) => setEmail(e.target.value)}
         />
 
-        {/* 🔐 Password + Show/Hide */}
+        {/*Password + Show/Hide */}
         <div style={{ position: "relative" }}>
           <input
             type={showPassword ? "text" : "password"}
