@@ -5,7 +5,7 @@ agent {
 }
 
 environment {
-    IMAGE_NAME = "swetamotar/netflix-clone:latest"
+    IMAGE_NAME = "swetabgm/netflix-clone:latest"
     DOCKER_HOST = "unix:///var/run/docker.sock"
 }
 
