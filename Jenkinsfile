@@ -5,7 +5,8 @@ agent {
 }
 
 environment {
-    IMAGE_NAME = "swetabgm/netflix-clone:latest"
+    FRONTEND_IMAGE = "swetabgm/netflix-frontend:latest"
+    BACKEND_IMAGE = "swetabgm/netflix-backend:latest"
     DOCKER_HOST = "unix:///var/run/docker.sock"
 }
 
@@ -38,12 +39,13 @@ stages {
             sh '''
             #!/bin/bash
 
-            docker rmi -f $IMAGE_NAME || true
+            docker rmi -f $FRONTEND_IMAGE || true
+            docker rmi -f $BACKEND_IMAGE || true
             '''
         }
     }
 
-    stage('Build Docker Image') {
+    stage('Build Docker Images') {
         steps {
 
             withCredentials([
@@ -54,10 +56,14 @@ stages {
                 #!/bin/bash
 
                 docker build --no-cache \
-                -t $IMAGE_NAME \
+                -t $FRONTEND_IMAGE \
                 --build-arg TMDB_V3_API_KEY=$API_KEY \
                 --build-arg VITE_API_URL=http://backend:8000/api \
                 .
+
+                docker build --no-cache \
+                -t $BACKEND_IMAGE \
+                ./backend
                 '''
             }
         }
@@ -71,7 +77,11 @@ stages {
 
             docker run --rm \
             -v /var/run/docker.sock:/var/run/docker.sock \
-            aquasec/trivy image $IMAGE_NAME
+            aquasec/trivy image $FRONTEND_IMAGE
+
+            docker run --rm \
+            -v /var/run/docker.sock:/var/run/docker.sock \
+            aquasec/trivy image $BACKEND_IMAGE
             '''
         }
     }
@@ -117,13 +127,15 @@ stages {
         }
     }
 
-    stage('Push Docker Image') {
+    stage('Push Docker Images') {
         steps {
 
             sh '''
             #!/bin/bash
 
-            docker push $IMAGE_NAME
+            docker push $FRONTEND_IMAGE
+
+            docker push $BACKEND_IMAGE
             '''
         }
     }
