@@ -20,7 +20,6 @@ function App() {
     if (savedProfile) setProfile(JSON.parse(savedProfile));
   }, []);
 
-  const isAdmin = localStorage.getItem("is_admin") === "true";
 
   // 🔐 LOGIN
   if (!user) return <Login setUser={setUser} />;
