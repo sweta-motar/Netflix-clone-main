@@ -136,7 +136,7 @@ stages {
 
             export KUBECONFIG=/var/jenkins_home/.kube/config
 
-            kubectl apply -f k8s/
+            kubectl apply --validate=false -f k8s/
 
             kubectl rollout restart deployment frontend
 
