@@ -182,4 +182,8 @@ ${env.BUILD_URL}
 """
 }
 }
+<<<<<<< HEAD
 }
+=======
+}
+>>>>>>> 0360216 (Fixed Kubernetes backend API URL)
