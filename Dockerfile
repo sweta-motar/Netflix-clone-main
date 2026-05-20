@@ -31,6 +31,7 @@ RUN rm -rf ./*
 
 # copy build output
 COPY --from=builder /app/dist .
+COPY nginx.conf /etc/nginx/conf.d/default.conf
 
 EXPOSE 80
 

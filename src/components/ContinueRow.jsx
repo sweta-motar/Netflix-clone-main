@@ -18,7 +18,9 @@ function ContinueRow({ setSelectedMovie }) {
   };
 
   const handleRemove = async (movie) => {
-    await removeFromHistory(movie.movie_id);
+    const result = await removeFromHistory(movie.movie_id);
+
+    if (!result) return;
 
     setMovies((prev) =>
       prev.filter((m) => m.movie_id !== movie.movie_id)

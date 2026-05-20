@@ -2,7 +2,7 @@ import { useEffect, useState } from "react";
 
 function Banner() {
   const [movie, setMovie] = useState(null);
-  const API_KEY = import.meta.env.VITE_APP_TMDB_V3_API_KEY;
+  const API_KEY = "b139582166405f939e11217717f711f9";
 
   useEffect(() => {
     const fetchBanner = async () => {

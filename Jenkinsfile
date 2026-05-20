@@ -58,7 +58,7 @@ stages {
                 docker build --no-cache \
                 -t $FRONTEND_IMAGE \
                 --build-arg TMDB_V3_API_KEY=$API_KEY \
-                --build-arg VITE_API_URL=http://backend:8000/api \
+                --build-arg VITE_API_URL=/api \
                 .
 
                 docker build --no-cache \
