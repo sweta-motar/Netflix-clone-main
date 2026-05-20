@@ -144,14 +144,11 @@ stages {
             sh '''
             #!/bin/bash
 
-            # Start Prometheus if not running
-            docker start prometheus 2>/dev/null || echo "Prometheus already running or starting fresh"
+            echo "Checking monitoring stack in Kubernetes..."
 
-            # Start Grafana if not running
-            docker start grafana 2>/dev/null || echo "Grafana already running or starting fresh"
-
-            # Start node-exporter if not running
-            docker start node-exporter 2>/dev/null || echo "Node exporter already running"
+            kubectl rollout status deployment/monitoring-grafana -n monitoring
+            kubectl rollout status statefulset/prometheus-monitoring-kube-prometheus-prometheus -n monitoring
+            kubectl rollout status daemonset/monitoring-prometheus-node-exporter -n monitoring
 
             echo "========================================="
             echo "Prometheus : http://172.30.23.49:9090"
