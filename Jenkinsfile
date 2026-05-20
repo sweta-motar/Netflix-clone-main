@@ -139,6 +139,28 @@ stages {
         }
     }
 
+    stage('Deploy Monitoring') {
+        steps {
+            sh '''
+            #!/bin/bash
+
+            # Start Prometheus if not running
+            docker start prometheus 2>/dev/null || echo "Prometheus already running or starting fresh"
+
+            # Start Grafana if not running
+            docker start grafana 2>/dev/null || echo "Grafana already running or starting fresh"
+
+            # Start node-exporter if not running
+            docker start node-exporter 2>/dev/null || echo "Node exporter already running"
+
+            echo "========================================="
+            echo "Prometheus : http://172.30.23.49:9090"
+            echo "Grafana    : http://172.30.23.49:3001"
+            echo "========================================="
+            '''
+        }
+    }
+
     stage('Deploy to Kubernetes') {
         steps {
 
