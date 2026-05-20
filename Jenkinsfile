@@ -71,17 +71,16 @@ stages {
 
     stage('Trivy Scan') {
         steps {
-
             sh '''
             #!/bin/bash
 
-            docker run --rm \
-            -v /var/run/docker.sock:/var/run/docker.sock \
-            aquasec/trivy image $FRONTEND_IMAGE
+            # Install trivy if not present
+            if ! command -v trivy &> /dev/null; then
+                curl -sfL https://raw.githubusercontent.com/aquasecurity/trivy/main/contrib/install.sh | sh -s -- -b /usr/local/bin
+            fi
 
-            docker run --rm \
-            -v /var/run/docker.sock:/var/run/docker.sock \
-            aquasec/trivy image $BACKEND_IMAGE
+            trivy image --exit-code 0 --severity HIGH,CRITICAL $FRONTEND_IMAGE
+            trivy image --exit-code 0 --severity HIGH,CRITICAL $BACKEND_IMAGE
             '''
         }
     }
