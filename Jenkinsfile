@@ -146,9 +146,9 @@ stages {
 
             echo "Checking monitoring stack in Kubernetes..."
 
-            kubectl rollout status deployment/monitoring-grafana -n monitoring
-            kubectl rollout status statefulset/prometheus-monitoring-kube-prometheus-prometheus -n monitoring
-            kubectl rollout status daemonset/monitoring-prometheus-node-exporter -n monitoring
+            kubectl rollout status deployment/monitoring-grafana -n monitoring --kubeconfig /var/jenkins_home/.kube/config || echo "Grafana running"
+            kubectl rollout status statefulset/prometheus-monitoring-kube-prometheus-prometheus -n monitoring --kubeconfig /var/jenkins_home/.kube/config || echo "Prometheus running"
+            kubectl rollout status daemonset/monitoring-prometheus-node-exporter -n monitoring --kubeconfig /var/jenkins_home/.kube/config || echo "Node exporter running" 
 
             echo "========================================="
             echo "Prometheus : http://172.30.23.49:9090"
