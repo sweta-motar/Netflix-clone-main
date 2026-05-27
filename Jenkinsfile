@@ -121,19 +121,6 @@ stages {
         }
     }
 
-    stage('Deploy Monitoring') {
-        steps {
-            sh '''
-                kubectl rollout status deployment/monitoring-grafana \
-                    -n monitoring --kubeconfig /var/jenkins_home/.kube/config || true
-                kubectl rollout status statefulset/prometheus-monitoring-kube-prometheus-prometheus \
-                    -n monitoring --kubeconfig /var/jenkins_home/.kube/config || true
-                kubectl rollout status daemonset/monitoring-prometheus-node-exporter \
-                    -n monitoring --kubeconfig /var/jenkins_home/.kube/config || true
-            '''
-        }
-    }
-
     stage('Deploy to Kubernetes') {
         steps {
             sh '''
